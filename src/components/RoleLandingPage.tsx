@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { LearnerProfile, UserRole } from '../types';
 import { SenaLogoComplete, SenaEmblem } from './SenaEmblem';
+import { Language, getTranslation } from '../utils/i18n';
 import {
   GraduationCap,
   Shield,
@@ -15,16 +16,19 @@ import {
   FileText,
   AlertCircle,
   Play,
-  X
+  X,
+  Globe
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
 interface Props {
   onSelectRole: (role: UserRole, initialProfile?: LearnerProfile) => void;
   defaultProfile: LearnerProfile;
+  language: Language;
+  onToggleLanguage: (lang: Language) => void;
 }
 
-export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile }) => {
+export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile, language, onToggleLanguage }) => {
   const [selectedMode, setSelectedMode] = useState<'chooser' | 'instructor_login' | 'aprendiz_form'>('chooser');
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   
@@ -70,13 +74,28 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
         <div className="flex items-center gap-3">
           <SenaLogoComplete />
         </div>
-        <div className="text-right">
-          <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest block">
-            Inducción Institucional 2026
-          </span>
-          <span className="text-xs text-slate-300">
-            Reglamento del Aprendiz • Acuerdo 0009
-          </span>
+        
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => {
+              playSound('click');
+              onToggleLanguage(language === 'es' ? 'en' : 'es');
+            }}
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+            title="Cambiar idioma / Change language"
+          >
+            <Globe className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{language === 'es' ? 'English (EN)' : 'Español (ES)'}</span>
+          </button>
+
+          <div className="text-right hidden sm:block">
+            <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest block">
+              {getTranslation(language, 'inductionTitle')}
+            </span>
+            <span className="text-xs text-slate-300">
+              {getTranslation(language, 'regulation')}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -90,10 +109,10 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                   <GraduationCap className="w-8 h-8" />
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                  Portal de Inducción SENA
+                  {getTranslation(language, 'portalTitle')}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                  Selecciona tu rol para ingresar a la plataforma interactiva de aprendizaje y normatividad del Acuerdo 0009 de 2024.
+                  {getTranslation(language, 'portalSubtitle')}
                 </p>
               </div>
 
@@ -107,7 +126,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                   className="w-full py-3.5 px-4 bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 hover:border-emerald-400 text-emerald-200 font-extrabold text-xs rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-emerald-400 text-emerald-400" />
-                  <span>Ver Video Tutorial de Inducción (Google Drive)</span>
+                  <span>{getTranslation(language, 'watchVideo')}</span>
                 </button>
               </div>
 
@@ -125,10 +144,10 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                   </div>
                   <div>
                     <h3 className="font-extrabold text-base text-white group-hover:text-emerald-300 transition-colors">
-                      Soy Aprendiz
+                      {getTranslation(language, 'apprenticeRole')}
                     </h3>
                     <p className="text-[11px] text-slate-400 mt-1">
-                      Realiza los módulos, simulador y obtén tu certificado
+                      {getTranslation(language, 'apprenticeDesc')}
                     </p>
                   </div>
                   <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[#39A900]">
@@ -150,10 +169,10 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                   </div>
                   <div>
                     <h3 className="font-extrabold text-base text-white group-hover:text-sky-300 transition-colors">
-                      Soy Instructor
+                      {getTranslation(language, 'instructorRole')}
                     </h3>
                     <p className="text-[11px] text-slate-400 mt-1">
-                      Panel de control, seguimiento y Google Drive
+                      {getTranslation(language, 'instructorDesc')}
                     </p>
                   </div>
                   <div className="pt-1 flex items-center gap-1 text-xs font-bold text-sky-400">
@@ -165,7 +184,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
 
               <div className="text-center pt-2">
                 <span className="text-[11px] text-slate-400">
-                  Servicio Nacional de Aprendizaje - SENA • Dirección General de Formación
+                  {getTranslation(language, 'senaTitle')} • Dirección General de Formación
                 </span>
               </div>
             </div>
@@ -182,7 +201,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                   }}
                   className="text-xs font-bold text-slate-400 hover:text-white transition-colors"
                 >
-                  ← Volver
+                  ← {getTranslation(language, 'back')}
                 </button>
                 <span className="px-3 py-1 bg-sky-950/80 text-sky-300 border border-sky-700 text-[11px] font-bold rounded-full">
                   Acceso Restringido
@@ -194,23 +213,23 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                   <KeyRound className="w-7 h-7" />
                 </div>
                 <h2 className="text-2xl font-black text-white">
-                  Clave de Instructor
+                  {getTranslation(language, 'instructorLogin')}
                 </h2>
                 <p className="text-xs text-slate-300">
-                  Ingresa la clave institucional asignada para administrar el panel de seguimiento.
+                  {getTranslation(language, 'instructorLoginDesc')}
                 </p>
               </div>
 
               <form onSubmit={handleInstructorSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-300">
-                    Contraseña de Instructor
+                    {getTranslation(language, 'instructorLogin')}
                   </label>
                   <input
                     type="password"
                     value={passwordInput}
                     onChange={(e) => setPasswordInput(e.target.value)}
-                    placeholder="Ingresa la clave (cata2026)"
+                    placeholder={getTranslation(language, 'passwordPlaceholder')}
                     autoFocus
                     className="w-full text-xs px-4 py-3 rounded-xl border border-slate-700 bg-slate-950 text-white font-mono focus:outline-hidden focus:border-[#39A900]"
                   />
@@ -229,13 +248,13 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                     onClick={() => setSelectedMode('chooser')}
                     className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-colors"
                   >
-                    Cancelar
+                    {getTranslation(language, 'cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 py-3 bg-[#00324D] hover:bg-[#004e75] text-white font-extrabold text-xs rounded-xl shadow-md transition-all border border-sky-600/30"
                   >
-                    Ingresar al Panel
+                    {getTranslation(language, 'enterPanel')}
                   </button>
                 </div>
               </form>
@@ -253,7 +272,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                   }}
                   className="text-xs font-bold text-slate-400 hover:text-white transition-colors"
                 >
-                  ← Volver
+                  ← {getTranslation(language, 'back')}
                 </button>
                 <span className="px-3 py-1 bg-emerald-950/80 text-emerald-300 border border-emerald-700 text-[11px] font-bold rounded-full">
                   Registro de Caracterización
@@ -262,17 +281,17 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
 
               <div className="space-y-1">
                 <h2 className="text-xl sm:text-2xl font-black text-white">
-                  Datos del Aprendiz
+                  {getTranslation(language, 'apprenticeForm')}
                 </h2>
                 <p className="text-xs text-slate-300">
-                  Ingresa tus datos personales y de ficha para generar tu certificado oficial al finalizar la inducción.
+                  {getTranslation(language, 'apprenticeFormDesc')}
                 </p>
               </div>
 
               <form onSubmit={handleAprendizSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-300">
-                    Nombre Completo
+                    {getTranslation(language, 'fullName')}
                   </label>
                   <input
                     type="text"
@@ -287,7 +306,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-300">
-                      Tipo Doc.
+                      {getTranslation(language, 'docType')}
                     </label>
                     <select
                       value={formProfile.documentType}
@@ -304,7 +323,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
 
                   <div className="sm:col-span-2 space-y-1.5">
                     <label className="text-xs font-bold text-slate-300">
-                      Número de Identificación
+                      {getTranslation(language, 'docNumber')}
                     </label>
                     <input
                       type="text"
@@ -320,7 +339,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-300">
-                      Número de Ficha
+                      {getTranslation(language, 'fichaNumber')}
                     </label>
                     <input
                       type="text"
@@ -334,7 +353,7 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-300">
-                      Programa de Formación
+                      {getTranslation(language, 'programName')}
                     </label>
                     <input
                       type="text"
@@ -360,13 +379,13 @@ export const RoleLandingPage: React.FC<Props> = ({ onSelectRole, defaultProfile 
                     onClick={() => setSelectedMode('chooser')}
                     className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-colors"
                   >
-                    Volver
+                    {getTranslation(language, 'back')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 py-3 bg-[#39A900] hover:bg-[#2e8800] text-white font-extrabold text-xs rounded-xl shadow-md transition-all"
                   >
-                    Iniciar Inducción 🚀
+                    {getTranslation(language, 'startInduction')}
                   </button>
                 </div>
               </form>

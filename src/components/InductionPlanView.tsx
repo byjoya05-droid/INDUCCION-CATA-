@@ -1,5 +1,6 @@
 import React from 'react';
 import { INDUCTION_PLAN_STEPS } from '../data/senaData';
+import { INDUCTION_PLAN_STEPS_EN, Language } from '../utils/i18n';
 import {
   Calendar,
   CheckCircle2,
@@ -14,14 +15,20 @@ import {
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
-export const InductionPlanView: React.FC = () => {
+interface Props {
+  language?: Language;
+}
+
+export const InductionPlanView: React.FC<Props> = ({ language = 'es' }) => {
+  const stepsToUse = language === 'en' ? INDUCTION_PLAN_STEPS_EN : INDUCTION_PLAN_STEPS;
+
   const handleDownloadPlan = () => {
     playSound('click');
     const textContent = `PLAN ESTRUCTURADO DE INDUCCIÓN SENA - ACUERDO 0009 DE 2024
 Servicio Nacional de Aprendizaje (SENA)
 Dirección de Formación Profesional Integral
 
-${INDUCTION_PLAN_STEPS.map((s, idx) => `
+${stepsToUse.map((s, idx) => `
 ${idx + 1}. ${s.phase.toUpperCase()}
    Duración: ${s.duration}
    Objetivo: ${s.objective}
@@ -51,15 +58,17 @@ Puntaje mínimo aprobatorio para certificación: 80%.
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center gap-1 border border-emerald-200 dark:border-emerald-800">
               <Calendar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              Diseño Curricular Institucional
+              {language === 'en' ? 'Institutional Curricular Design' : 'Diseño Curricular Institucional'}
             </span>
             <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">Plan Pedagógico 2024</span>
           </div>
           <h2 className="text-2xl font-black text-[#00324D] dark:text-white tracking-tight">
-            Plan Estructurado de Inducción SENA
+            {language === 'en' ? 'SENA Structured Induction Plan' : 'Plan Estructurado de Inducción SENA'}
           </h2>
           <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mt-1">
-            Cronograma y ruta metodológica de 4 fases para la apropiación del nuevo reglamento, derechos, deberes y cultura SENA.
+            {language === 'en'
+              ? 'Schedule and 4-phase methodological roadmap for appropriating the new regulations, rights, duties, and SENA culture.'
+              : 'Cronograma y ruta metodológica de 4 fases para la apropiación del nuevo reglamento, derechos, deberes y cultura SENA.'}
           </p>
         </div>
 
@@ -68,7 +77,7 @@ Puntaje mínimo aprobatorio para certificación: 80%.
           className="flex items-center gap-2 px-4 py-2.5 bg-[#00324D] dark:bg-emerald-700 hover:bg-[#002235] dark:hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-xs transition-colors self-start md:self-center"
         >
           <Download className="w-4 h-4" />
-          <span>Exportar Plan (.TXT)</span>
+          <span>{language === 'en' ? 'Export Plan (.TXT)' : 'Exportar Plan (.TXT)'}</span>
         </button>
       </div>
 
@@ -78,9 +87,13 @@ Puntaje mínimo aprobatorio para certificación: 80%.
           <div className="w-9 h-9 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mb-3">
             <Target className="w-5 h-5" />
           </div>
-          <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">1. Enfoque por Competencias</h4>
+          <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">
+            {language === 'en' ? '1. Competency-Based Approach' : '1. Enfoque por Competencias'}
+          </h4>
           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            Formación integral del saber, saber hacer y saber ser en convivencia armónica.
+            {language === 'en'
+              ? 'Comprehensive training of knowing, doing, and being in harmonious coexistence.'
+              : 'Formación integral del saber, saber hacer y saber ser en convivencia armónica.'}
           </p>
         </div>
 
@@ -88,9 +101,13 @@ Puntaje mínimo aprobatorio para certificación: 80%.
           <div className="w-9 h-9 rounded-xl bg-sky-500/10 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 flex items-center justify-center mb-3">
             <Sparkles className="w-5 h-5" />
           </div>
-          <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">2. Gamificación Formativa</h4>
+          <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">
+            {language === 'en' ? '2. Formative Gamification' : '2. Gamificación Formativa'}
+          </h4>
           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            Misiones interactivas, rachas, dilemas éticos y XP que incentivan el aprendizaje significativo.
+            {language === 'en'
+              ? 'Interactive missions, streaks, ethical dilemmas, and XP that encourage meaningful learning.'
+              : 'Misiones interactivas, rachas, dilemas éticos y XP que incentivan el aprendizaje significativo.'}
           </p>
         </div>
 
@@ -98,16 +115,20 @@ Puntaje mínimo aprobatorio para certificación: 80%.
           <div className="w-9 h-9 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 flex items-center justify-center mb-3">
             <FileCheck className="w-5 h-5" />
           </div>
-          <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">3. Certificación Verificable</h4>
+          <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">
+            {language === 'en' ? '3. Verifiable Certification' : '3. Certificación Verificable'}
+          </h4>
           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            Acreditación con umbral del 80% y código QR único de validación para el centro de formación.
+            {language === 'en'
+              ? 'Accreditation with 80% threshold and unique QR validation code for the training center.'
+              : 'Acreditación con umbral del 80% y código QR único de validación para el centro de formación.'}
           </p>
         </div>
       </div>
 
       {/* Structured Steps Timeline */}
       <div className="space-y-4">
-        {INDUCTION_PLAN_STEPS.map((step, idx) => (
+        {stepsToUse.map((step, idx) => (
           <div
             key={idx}
             className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs hover:border-emerald-200 dark:hover:border-emerald-700 transition-all group"
@@ -126,25 +147,27 @@ Puntaje mínimo aprobatorio para certificación: 80%.
                       <Clock className="w-3.5 h-3.5" /> {step.duration}
                     </span>
                     <span>•</span>
-                    <span>Marco: Acuerdo 0009 de 2024</span>
+                    <span>{language === 'en' ? 'Framework: Agreement 0009 of 2024' : 'Marco: Acuerdo 0009 de 2024'}</span>
                   </div>
                 </div>
               </div>
 
               <div className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-3 py-1 rounded-lg self-start border border-slate-200 dark:border-slate-700">
-                Entregable: {step.deliverable}
+                {language === 'en' ? 'Deliverable: ' : 'Entregable: '}{step.deliverable}
               </div>
             </div>
 
             <div className="space-y-3 pl-0 md:pl-12">
               <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl text-xs text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-800">
-                <span className="font-bold text-[#00324D] dark:text-emerald-400">Objetivo Pedagógico: </span>
+                <span className="font-bold text-[#00324D] dark:text-emerald-400">
+                  {language === 'en' ? 'Pedagogical Objective: ' : 'Objetivo Pedagógico: '}
+                </span>
                 {step.objective}
               </div>
 
               <div>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
-                  Actividades de Aprendizaje Presenciales y Virtuales:
+                  {language === 'en' ? 'Face-to-Face and Virtual Learning Activities:' : 'Actividades de Aprendizaje Presenciales y Virtuales:'}
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {step.activities.map((act, aIdx) => (

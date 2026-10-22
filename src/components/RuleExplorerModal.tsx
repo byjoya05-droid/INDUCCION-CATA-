@@ -1,29 +1,33 @@
 import React, { useState } from 'react';
 import { RULE_ARTICLES } from '../data/senaData';
+import { RULE_ARTICLES_EN, Language } from '../utils/i18n';
 import { RuleArticle } from '../types';
 import { Search, BookOpen, Shield, CheckCircle, AlertTriangle, X, BookmarkCheck } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  language?: Language;
 }
 
-export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose }) => {
+export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose, language = 'es' }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
 
   if (!isOpen) return null;
 
+  const articlesToUse = language === 'en' ? RULE_ARTICLES_EN : RULE_ARTICLES;
+
   const categories = [
-    { id: 'todos', label: 'Todos los Artículos' },
-    { id: 'derecho', label: 'Derechos (Cap. II)' },
-    { id: 'deber', label: 'Deberes (Cap. III)' },
-    { id: 'prohibicion', label: 'Prohibiciones' },
-    { id: 'medida_formativa', label: 'Medidas Formativas' },
-    { id: 'sancion', label: 'Sanciones (Cap. V)' }
+    { id: 'todos', label: language === 'en' ? 'All Articles' : 'Todos los Artículos' },
+    { id: 'derecho', label: language === 'en' ? 'Rights (Cap. II)' : 'Derechos (Cap. II)' },
+    { id: 'deber', label: language === 'en' ? 'Duties (Cap. III)' : 'Deberes (Cap. III)' },
+    { id: 'prohibicion', label: language === 'en' ? 'Prohibitions' : 'Prohibiciones' },
+    { id: 'medida_formativa', label: language === 'en' ? 'Formative Measures' : 'Medidas Formativas' },
+    { id: 'sancion', label: language === 'en' ? 'Sanctions (Cap. V)' : 'Sanciones (Cap. V)' }
   ];
 
-  const filteredArticles = RULE_ARTICLES.filter((art) => {
+  const filteredArticles = articlesToUse.filter((art) => {
     const matchesCategory = selectedCategory === 'todos' || art.category === selectedCategory;
     const matchesSearch =
       art.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -37,15 +41,15 @@ export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const getCategoryBadge = (category: RuleArticle['category']) => {
     switch (category) {
       case 'derecho':
-        return <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><Shield className="w-3 h-3" /> Derecho</span>;
+        return <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><Shield className="w-3 h-3" /> {language === 'en' ? 'Right' : 'Derecho'}</span>;
       case 'deber':
-        return <span className="bg-sky-100 text-sky-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Deber</span>;
+        return <span className="bg-sky-100 text-sky-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><CheckCircle className="w-3 h-3" /> {language === 'en' ? 'Duty' : 'Deber'}</span>;
       case 'prohibicion':
-        return <span className="bg-rose-100 text-rose-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Prohibición</span>;
+        return <span className="bg-rose-100 text-rose-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> {language === 'en' ? 'Prohibition' : 'Prohibición'}</span>;
       case 'medida_formativa':
-        return <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><BookOpen className="w-3 h-3" /> Medida Formativa</span>;
+        return <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><BookOpen className="w-3 h-3" /> {language === 'en' ? 'Formative Measure' : 'Medida Formativa'}</span>;
       case 'sancion':
-        return <span className="bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Sanción</span>;
+        return <span className="bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> {language === 'en' ? 'Sanction' : 'Sanción'}</span>;
       default:
         return null;
     }
@@ -62,12 +66,12 @@ export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg">Buscador del Reglamento del Aprendiz</h3>
+                <h3 className="font-bold text-lg">{language === 'en' ? 'Apprentice Regulation Explorer' : 'Buscador del Reglamento del Aprendiz'}</h3>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded-full border border-emerald-400/30">
                   Acuerdo 0009 de 2024
                 </span>
               </div>
-              <p className="text-xs text-slate-300">Consulta rápida de artículos, garantías y régimen disciplinario</p>
+              <p className="text-xs text-slate-300">{language === 'en' ? 'Quick lookup of articles, guarantees and disciplinary regime' : 'Consulta rápida de artículos, garantías y régimen disciplinario'}</p>
             </div>
           </div>
           <button
@@ -86,7 +90,7 @@ export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose }) => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por palabra clave (ej. debido proceso, plagio, inasistencia, EPP, sanción)..."
+              placeholder={language === 'en' ? 'Search by keyword (e.g. due process, plagiarism, absence, PPE)...' : 'Buscar por palabra clave (ej. debido proceso, plagio, inasistencia, EPP, sanción)...'}
               className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#39A900] outline-none"
             />
             {searchTerm && (
@@ -121,8 +125,8 @@ export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose }) => {
           {filteredArticles.length === 0 ? (
             <div className="text-center py-12 text-slate-400">
               <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-40" />
-              <p className="font-medium text-slate-600 dark:text-slate-400">No se encontraron artículos con ese criterio.</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Intenta con términos más generales como "plagio", "asistencia" o "garantías".</p>
+              <p className="font-medium text-slate-600 dark:text-slate-400">{language === 'en' ? 'No articles found with that criteria.' : 'No se encontraron artículos con ese criterio.'}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{language === 'en' ? 'Try broader terms like "plagiarism", "attendance" or "guarantees".' : 'Intenta con términos más generales como "plagio", "asistencia" o "garantías".'}</p>
             </div>
           ) : (
             filteredArticles.map((art) => (
@@ -153,7 +157,7 @@ export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   <div className="mt-2.5 p-2.5 bg-emerald-50/70 dark:bg-emerald-950/40 border-l-4 border-[#39A900] rounded-r-lg text-xs text-emerald-900 dark:text-emerald-200 flex items-start gap-2">
                     <BookmarkCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-bold">Clave formativa: </span>
+                      <span className="font-bold">{language === 'en' ? 'Formative tip: ' : 'Clave formativa: '}</span>
                       {art.practicalTip}
                     </div>
                   </div>
@@ -165,12 +169,12 @@ export const RuleExplorerModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
         {/* Footer */}
         <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-          <span>Mostrando {filteredArticles.length} de {RULE_ARTICLES.length} artículos clave</span>
+          <span>{language === 'en' ? `Showing ${filteredArticles.length} of ${articlesToUse.length} key articles` : `Mostrando ${filteredArticles.length} de ${articlesToUse.length} artículos clave`}</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold rounded-lg transition-colors border border-transparent dark:border-slate-700"
           >
-            Cerrar Consulta
+            {language === 'en' ? 'Close Lookup' : 'Cerrar Consulta'}
           </button>
         </div>
       </div>

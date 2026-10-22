@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LearnerProfile, Badge, UserRole } from './types';
+import { Language } from './utils/i18n';
 import { DEFAULT_PROFILE, INITIAL_BADGES } from './data/senaData';
 import { RoleLandingPage } from './components/RoleLandingPage';
 import { InstructorDashboard } from './components/InstructorDashboard';
@@ -51,6 +52,21 @@ export default function App() {
       return 'none';
     }
   });
+
+  const [language, setLanguage] = useState<Language>(() => {
+    try {
+      return (localStorage.getItem('sena_language') as Language) || 'es';
+    } catch {
+      return 'es';
+    }
+  });
+
+  const handleToggleLanguage = (lang: Language) => {
+    setLanguage(lang);
+    try {
+      localStorage.setItem('sena_language', lang);
+    } catch {}
+  };
 
   // Default ficha & program configured by instructor
   const [defaultFicha, setDefaultFicha] = useState<string>(() => {
@@ -319,6 +335,8 @@ export default function App() {
     return (
       <RoleLandingPage
         defaultProfile={profile}
+        language={language}
+        onToggleLanguage={handleToggleLanguage}
         onSelectRole={(role, initialProfile) => {
           setUserRole(role);
           if (initialProfile) {
@@ -390,6 +408,8 @@ export default function App() {
           setUserRole('none');
           localStorage.removeItem('sena_user_role');
         }}
+        language={language}
+        onToggleLanguage={handleToggleLanguage}
       />
 
       {/* Main App Container */}
@@ -511,7 +531,7 @@ export default function App() {
               />
             )}
 
-            {currentTab === 'plan' && <InductionPlanView />}
+            {currentTab === 'plan' && <InductionPlanView language={language} />}
           </>
         )}
       </main>
@@ -570,6 +590,7 @@ export default function App() {
       <RuleExplorerModal
         isOpen={isExplorerModalOpen}
         onClose={() => setIsExplorerModalOpen(false)}
+        language={language}
       />
 
       <BadgeDrawer

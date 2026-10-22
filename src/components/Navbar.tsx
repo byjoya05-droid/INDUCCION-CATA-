@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LearnerProfile, Badge } from '../types';
+import { Language, getTranslation } from '../utils/i18n';
 import { SenaLogoComplete } from './SenaEmblem';
 import {
   BookOpen,
@@ -47,6 +48,8 @@ interface Props {
   userRole?: 'instructor' | 'aprendiz';
   onSwitchRole?: (role: 'instructor' | 'aprendiz') => void;
   onLogout?: () => void;
+  language?: Language;
+  onToggleLanguage?: (lang: Language) => void;
 }
 
 export const Navbar: React.FC<Props> = ({
@@ -70,7 +73,9 @@ export const Navbar: React.FC<Props> = ({
   onTriggerSync,
   userRole = 'instructor',
   onSwitchRole,
-  onLogout
+  onLogout,
+  language = 'es',
+  onToggleLanguage
 }) => {
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -86,7 +91,7 @@ export const Navbar: React.FC<Props> = ({
       ? [
           {
             id: 'instructor',
-            label: 'Panel Instructor',
+            label: getTranslation(language, 'instructorPanel'),
             icon: Shield,
             badge: 'Admin'
           }
@@ -94,19 +99,19 @@ export const Navbar: React.FC<Props> = ({
       : []),
     {
       id: 'modulos',
-      label: 'Módulos Formativos',
+      label: getTranslation(language, 'modules'),
       icon: BookOpen,
       badge: `${completedModulesCount}/${totalModulesCount}`
     },
-    { id: 'casos', label: 'Simulador de Casos', icon: Scale },
-    { id: 'quiz', label: 'Evaluación Final', icon: Award },
+    { id: 'casos', label: getTranslation(language, 'cases'), icon: Scale },
+    { id: 'quiz', label: getTranslation(language, 'quiz'), icon: Award },
     {
       id: 'certificado',
-      label: 'Certificado Oficial',
+      label: getTranslation(language, 'certificate'),
       icon: GraduationCap,
       badge: isCertificateUnlocked ? '¡Listo!' : 'Bloqueado'
     },
-    { id: 'plan', label: 'Plan Estructurado', icon: Calendar }
+    { id: 'plan', label: getTranslation(language, 'plan'), icon: Calendar }
   ];
 
   const unlockedBadgesCount = badges.filter((b) => b.isUnlocked).length;
@@ -196,7 +201,19 @@ export const Navbar: React.FC<Props> = ({
             className="text-rose-300 hover:text-white font-bold transition-colors flex items-center gap-1 cursor-pointer text-[11px] bg-rose-950/60 px-2.5 py-1 rounded-lg border border-rose-800/60"
             title="Cerrar sesión y volver a la selección de rol"
           >
-            <span>Cerrar Sesión</span>
+            <span>{getTranslation(language, 'logout')}</span>
+          </button>
+
+          <span className="hidden sm:inline text-slate-400">|</span>
+          <button
+            onClick={() => {
+              playSound('click');
+              onToggleLanguage?.(language === 'es' ? 'en' : 'es');
+            }}
+            className="text-slate-200 hover:text-white font-bold transition-colors flex items-center gap-1 cursor-pointer text-[11px] bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 shadow-2xs"
+            title="Cambiar idioma / Change language"
+          >
+            <span>{language === 'es' ? 'EN 🇬🇧' : 'ES 🇨🇴'}</span>
           </button>
         </div>
       </div>
