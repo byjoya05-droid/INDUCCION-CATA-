@@ -11,6 +11,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
+import { Language } from '../utils/i18n';
 
 export interface ModuleStepInfo {
   id: 'mod-1' | 'mod-2' | 'mod-3' | 'mod-4';
@@ -22,7 +23,7 @@ export interface ModuleStepInfo {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-export const REGULATION_MODULES: ModuleStepInfo[] = [
+export const REGULATION_MODULES_ES: ModuleStepInfo[] = [
   {
     id: 'mod-1',
     tabId: 'identidad',
@@ -61,6 +62,45 @@ export const REGULATION_MODULES: ModuleStepInfo[] = [
   }
 ];
 
+export const REGULATION_MODULES_EN: ModuleStepInfo[] = [
+  {
+    id: 'mod-1',
+    tabId: 'identidad',
+    number: 1,
+    title: 'SENA Identity and Comprehensive Professional Training',
+    shortTitle: '1. Identity & FPI',
+    chapterRef: 'Chapter I & Principles',
+    icon: Compass
+  },
+  {
+    id: 'mod-2',
+    tabId: 'derechos',
+    number: 2,
+    title: 'Apprentice Bill of Rights',
+    shortTitle: '2. Rights',
+    chapterRef: 'Chapter II (Guarantees)',
+    icon: ShieldCheck
+  },
+  {
+    id: 'mod-3',
+    tabId: 'deberes',
+    number: 3,
+    title: 'Express Duties and Prohibitions',
+    shortTitle: '3. Duties & Prohibitions',
+    chapterRef: 'Chapters III & IV',
+    icon: CheckCircle2
+  },
+  {
+    id: 'mod-4',
+    tabId: 'regimen',
+    number: 4,
+    title: 'Disciplinary Regime and Due Process',
+    shortTitle: '4. Disciplinary Regime',
+    chapterRef: 'Chapters V & VI (Measures)',
+    icon: Scale
+  }
+];
+
 interface Props {
   completedModules: string[];
   onNavigateToModule: (tabId: 'identidad' | 'derechos' | 'deberes' | 'regimen') => void;
@@ -68,6 +108,7 @@ interface Props {
   onGoToQuiz?: () => void;
   currentTab?: string;
   activeModuleTab?: string;
+  language?: Language;
 }
 
 export const GlobalProgressBar: React.FC<Props> = ({
@@ -76,11 +117,13 @@ export const GlobalProgressBar: React.FC<Props> = ({
   onGoToCases,
   onGoToQuiz,
   currentTab = 'modulos',
-  activeModuleTab = 'identidad'
+  activeModuleTab = 'identidad',
+  language = 'es'
 }) => {
-  const totalModules = REGULATION_MODULES.length;
+  const modulesList = language === 'en' ? REGULATION_MODULES_EN : REGULATION_MODULES_ES;
+  const totalModules = modulesList.length;
   const completedCount = completedModules.filter((id) =>
-    REGULATION_MODULES.some((m) => m.id === id)
+    modulesList.some((m) => m.id === id)
   ).length;
 
   const progressPercent = Math.round((completedCount / totalModules) * 100);
@@ -93,7 +136,7 @@ export const GlobalProgressBar: React.FC<Props> = ({
 
   return (
     <section
-      aria-label="Progreso global de módulos del Reglamento del Aprendiz"
+      aria-label={language === 'en' ? 'Apprentice Regulation global progress' : 'Progreso global de módulos del Reglamento del Aprendiz'}
       className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 sm:p-5 transition-all no-print"
     >
       {/* Top Header of Progress Bar */}
@@ -105,14 +148,16 @@ export const GlobalProgressBar: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-extrabold text-sm sm:text-base text-[#00324D] dark:text-white tracking-tight">
-                Progreso Global del Reglamento del Aprendiz
+                {language === 'en' ? 'Global Apprentice Regulation Progress' : 'Progreso Global del Reglamento del Aprendiz'}
               </h3>
               <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                Acuerdo 0009 de 2024
+                {language === 'en' ? 'Agreement 0009 of 2024' : 'Acuerdo 0009 de 2024'}
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {completedCount} de {totalModules} módulos completados ({progressPercent}%)
+              {language === 'en'
+                ? `${completedCount} of ${totalModules} modules completed (${progressPercent}%)`
+                : `${completedCount} de ${totalModules} módulos completados (${progressPercent}%)`}
             </p>
           </div>
         </div>
@@ -120,7 +165,9 @@ export const GlobalProgressBar: React.FC<Props> = ({
         {/* Status Percentage Badge */}
         <div className="flex items-center gap-2 self-start sm:self-center">
           <div className="flex items-baseline gap-1 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Avance:</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              {language === 'en' ? 'Progress:' : 'Avance:'}
+            </span>
             <span className={`text-base font-black ${
               isAllComplete
                 ? 'text-[#39A900] dark:text-emerald-400'
@@ -133,7 +180,7 @@ export const GlobalProgressBar: React.FC<Props> = ({
           {isAllComplete && (
             <span className="hidden md:inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 animate-in fade-in">
               <Trophy className="w-3.5 h-3.5 text-[#39A900]" />
-              ¡100% Normativo!
+              {language === 'en' ? '100% Completed!' : '¡100% Normativo!'}
             </span>
           )}
         </div>
@@ -161,17 +208,19 @@ export const GlobalProgressBar: React.FC<Props> = ({
 
         {/* Scale labels under the bar */}
         <div className="flex justify-between text-[10px] font-mono text-slate-400 dark:text-slate-500 px-0.5">
-          <span>0% Inicio</span>
-          <span>25% Mod 1</span>
-          <span>50% Mod 2</span>
-          <span>75% Mod 3</span>
-          <span className={isAllComplete ? 'text-[#39A900] font-bold' : ''}>100% Completado</span>
+          <span>{language === 'en' ? '0% Start' : '0% Inicio'}</span>
+          <span>{language === 'en' ? '25% Mod 1' : '25% Mod 1'}</span>
+          <span>{language === 'en' ? '50% Mod 2' : '50% Mod 2'}</span>
+          <span>{language === 'en' ? '75% Mod 3' : '75% Mod 3'}</span>
+          <span className={isAllComplete ? 'text-[#39A900] font-bold' : ''}>
+            {language === 'en' ? '100% Complete' : '100% Completado'}
+          </span>
         </div>
       </div>
 
       {/* Interactive Module Step Chips */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {REGULATION_MODULES.map((mod) => {
+        {modulesList.map((mod) => {
           const isDone = completedModules.includes(mod.id);
           const isCurrentInViewer = currentTab === 'modulos' && activeModuleTab === mod.tabId;
           const Icon = mod.icon;
@@ -180,7 +229,7 @@ export const GlobalProgressBar: React.FC<Props> = ({
             <button
               key={mod.id}
               onClick={() => handleStepClick(mod.tabId)}
-              title={`Clic para ir al módulo: ${mod.title}`}
+              title={language === 'en' ? `Click to view module: ${mod.title}` : `Clic para ir al módulo: ${mod.title}`}
               className={`flex items-center gap-2.5 p-2 sm:p-2.5 rounded-xl border text-left transition-all group cursor-pointer ${
                 isDone
                   ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100/60 dark:hover:bg-emerald-950/50'
@@ -220,7 +269,7 @@ export const GlobalProgressBar: React.FC<Props> = ({
                     ? 'text-emerald-700 dark:text-emerald-400 font-semibold'
                     : 'text-slate-400 dark:text-slate-400'
                 }`}>
-                  {isDone ? '✓ Completado' : mod.chapterRef}
+                  {isDone ? (language === 'en' ? '✓ Completed' : '✓ Completado') : mod.chapterRef}
                 </span>
               </div>
             </button>
@@ -234,7 +283,7 @@ export const GlobalProgressBar: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[#39A900] flex-shrink-0" />
             <p className="text-xs font-medium text-emerald-900 dark:text-emerald-200">
-              <strong>¡Ruta Normativa Finalizada!</strong> Has revisado los 4 módulos del Acuerdo 0009 de 2024. Pon a prueba tus conocimientos en el simulador o rinde la evaluación.
+              <strong>{language === 'en' ? 'Normative Roadmap Completed!' : '¡Ruta Normativa Finalizada!'}</strong> {language === 'en' ? 'You have reviewed all 4 modules of Agreement 0009 of 2024. Test your knowledge in the simulator or take the evaluation.' : 'Has revisado los 4 módulos del Acuerdo 0009 de 2024. Pon a prueba tus conocimientos en el simulador o rinde la evaluación.'}
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -243,7 +292,7 @@ export const GlobalProgressBar: React.FC<Props> = ({
                 onClick={onGoToCases}
                 className="px-3 py-1.5 bg-[#00324D] dark:bg-slate-800 hover:bg-[#002235] text-white font-bold text-xs rounded-lg transition-colors flex items-center gap-1 shadow-xs"
               >
-                <span>Simulador</span>
+                <span>{language === 'en' ? 'Simulator' : 'Simulador'}</span>
                 <ChevronRight className="w-3 h-3" />
               </button>
             )}
@@ -252,8 +301,8 @@ export const GlobalProgressBar: React.FC<Props> = ({
                 onClick={onGoToQuiz}
                 className="px-3.5 py-1.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-extrabold text-xs rounded-lg transition-all flex items-center gap-1 shadow-sm"
               >
-                <span>Evaluación Final</span>
-                <ArrowRight className="w-3 h-3" />
+                <span>{language === 'en' ? 'Final Quiz' : 'Evaluación Final'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
           </div>

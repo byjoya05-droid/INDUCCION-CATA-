@@ -32,18 +32,22 @@ import {
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
+import { Language } from '../utils/i18n';
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   syncData: ApprenticeSyncData;
   onSyncSuccess?: (spreadsheetUrl: string) => void;
+  language?: Language;
 }
 
 export const GoogleDriveSyncModal: React.FC<Props> = ({
   isOpen,
   onClose,
   syncData,
-  onSyncSuccess
+  onSyncSuccess,
+  language = 'es'
 }) => {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -198,13 +202,17 @@ export const GoogleDriveSyncModal: React.FC<Props> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-base sm:text-lg">Almacenamiento en Google Drive</h3>
+                <h3 className="font-extrabold text-base sm:text-lg">
+                  {language === 'en' ? 'Google Drive Cloud Storage' : 'Almacenamiento en Google Drive'}
+                </h3>
                 <span className="text-[10px] bg-white/20 text-white font-bold px-2 py-0.5 rounded-full backdrop-blur-xs">
                   Google Sheets API
                 </span>
               </div>
               <p className="text-xs text-slate-200">
-                Registro y sincronización de aprendices bajo el Acuerdo 0009 de 2024
+                {language === 'en'
+                  ? 'Registration and apprentice synchronization under Agreement 0009 of 2024'
+                  : 'Registro y sincronización de aprendices bajo el Acuerdo 0009 de 2024'}
               </p>
             </div>
           </div>
@@ -226,10 +234,12 @@ export const GoogleDriveSyncModal: React.FC<Props> = ({
               </div>
               <div className="max-w-md mx-auto">
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
-                  Conecta tu cuenta de Google
+                  {language === 'en' ? 'Connect your Google Account' : 'Conecta tu cuenta de Google'}
                 </h4>
                 <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-                  Para guardar los datos de inducción de los aprendices en una hoja de cálculo en tu Google Drive, inicia sesión con tu cuenta de Google con el permiso requerido.
+                  {language === 'en'
+                    ? 'To store apprentice induction data in a Google Sheets spreadsheet in your Drive, sign in with your Google account.'
+                    : 'Para guardar los datos de inducción de los aprendices en una hoja de cálculo en tu Google Drive, inicia sesión con tu cuenta de Google con el permiso requerido.'}
                 </p>
               </div>
 
@@ -246,7 +256,7 @@ export const GoogleDriveSyncModal: React.FC<Props> = ({
                     <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
                     <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
                   </svg>
-                  <span>{isSigningIn ? 'Conectando con Google...' : 'Acceder con Google'}</span>
+                  <span>{isSigningIn ? (language === 'en' ? 'Connecting with Google...' : 'Conectando con Google...') : (language === 'en' ? 'Sign in with Google' : 'Acceder con Google')}</span>
                 </button>
               </div>
 
@@ -274,10 +284,10 @@ export const GoogleDriveSyncModal: React.FC<Props> = ({
                 <div>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-xs sm:text-sm text-emerald-950 dark:text-emerald-100">
-                      {currentUser.displayName || 'Usuario Conectado'}
+                      {currentUser.displayName || (language === 'en' ? 'Connected User' : 'Usuario Conectado')}
                     </span>
                     <span className="text-[10px] bg-emerald-200/80 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 font-bold px-2 py-0.2 rounded-full">
-                      ✓ Conectado
+                      ✓ {language === 'en' ? 'Connected' : 'Conectado'}
                     </span>
                   </div>
                   <p className="text-xs text-emerald-800 dark:text-emerald-300 truncate max-w-[240px] sm:max-w-none">
@@ -288,7 +298,7 @@ export const GoogleDriveSyncModal: React.FC<Props> = ({
 
               <button
                 onClick={handleSignOut}
-                title="Cerrar sesión de Google"
+                title={language === 'en' ? 'Sign out of Google' : 'Cerrar sesión de Google'}
                 className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <LogOut className="w-4 h-4" />

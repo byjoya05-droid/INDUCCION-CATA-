@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { QUIZ_QUESTIONS } from '../data/senaData';
 import { QuizQuestion } from '../types';
+import { Language, getQuizQuestions, getTranslation } from '../utils/i18n';
 import confetti from 'canvas-confetti';
 import {
   Trophy,
@@ -22,13 +22,15 @@ interface Props {
   onQuizCompleted: (passed: boolean, scorePercent: number) => void;
   isCertificateUnlocked: boolean;
   onGoToCertificate: () => void;
+  language?: Language;
 }
 
 export const GamifiedQuiz: React.FC<Props> = ({
   onEarnXP,
   onQuizCompleted,
   isCertificateUnlocked,
-  onGoToCertificate
+  onGoToCertificate,
+  language = 'es'
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -38,7 +40,8 @@ export const GamifiedQuiz: React.FC<Props> = ({
   const [isFinished, setIsFinished] = useState(false);
   const [userAnswers, setUserAnswers] = useState<Array<{ questionIndex: number; selected: number; isCorrect: boolean }>>([]);
 
-  const currentQ: QuizQuestion = QUIZ_QUESTIONS[currentIndex];
+  const questions = getQuizQuestions(language);
+  const currentQ: QuizQuestion = questions[currentIndex] || questions[0];
   const isAnswered = selectedOption !== null;
 
   const handleSelectOption = (idx: number) => {
@@ -56,7 +59,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
 
       // XP with combo bonus
       const bonusXP = newStreak > 2 ? currentQ.xpValue * 1.5 : currentQ.xpValue;
-      onEarnXP(Math.round(bonusXP), `Respuesta correcta (${newStreak} en racha)`);
+      onEarnXP(Math.round(bonusXP), `${getTranslation(language, 'correctAnswer')} (${newStreak} ${getTranslation(language, 'streak')})`);
     } else {
       playSound('wrong');
       setStreak(0);
@@ -70,7 +73,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
 
   const handleNext = () => {
     playSound('click');
-    if (currentIndex < QUIZ_QUESTIONS.length - 1) {
+    if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
     } else {
@@ -79,8 +82,8 @@ export const GamifiedQuiz: React.FC<Props> = ({
   };
 
   const finishQuiz = () => {
-    const finalScore = score + (selectedOption === currentQ.correctAnswerIndex ? 0 : 0); // already updated
-    const percent = Math.round((finalScore / QUIZ_QUESTIONS.length) * 100);
+    const finalScore = score + (selectedOption === currentQ.correctAnswerIndex ? 0 : 0);
+    const percent = Math.round((finalScore / questions.length) * 100);
     const passed = percent >= 80;
 
     setIsFinished(true);
@@ -106,7 +109,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
     setUserAnswers([]);
   };
 
-  const scorePercent = Math.round((score / QUIZ_QUESTIONS.length) * 100);
+  const scorePercent = Math.round((score / questions.length) * 100);
   const passed = scorePercent >= 80;
 
   return (
@@ -118,15 +121,17 @@ export const GamifiedQuiz: React.FC<Props> = ({
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 flex items-center gap-1 border border-amber-200 dark:border-amber-800">
                 <Trophy className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                Desafío del Saber: Reglamento SENA
+                {getTranslation(language, 'quizBadge')}
               </span>
-              <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">Puntaje mínimo aprobatorio: 80%</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+                {getTranslation(language, 'quizMinScore')}
+              </span>
             </div>
             <h2 className="text-2xl font-black text-[#00324D] dark:text-white tracking-tight">
-              Evaluación Final Gamificada
+              {getTranslation(language, 'quizHeading')}
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mt-1">
-              Demuestra tu apropiación de las normas, derechos y deberes. Al superar el 80% se liberará de manera inmediata tu Certificado Oficial de Inducción.
+              {getTranslation(language, 'quizDesc')}
             </p>
           </div>
 
@@ -134,13 +139,15 @@ export const GamifiedQuiz: React.FC<Props> = ({
             {streak > 1 && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white rounded-xl font-bold text-xs shadow-sm animate-pulse">
                 <Flame className="w-4 h-4 fill-white" />
-                <span>Racha x{streak}</span>
+                <span>{getTranslation(language, 'streak')} x{streak}</span>
               </div>
             )}
             <div className="text-right">
-              <span className="text-xs text-slate-400 dark:text-slate-400 block font-medium">Aciertos</span>
+              <span className="text-xs text-slate-400 dark:text-slate-400 block font-medium">
+                {getTranslation(language, 'correctHits')}
+              </span>
               <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                {score} / {QUIZ_QUESTIONS.length}
+                {score} / {questions.length}
               </span>
             </div>
           </div>
@@ -150,7 +157,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
         <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full mt-6 overflow-hidden">
           <div
             className="bg-[#39A900] h-full transition-all duration-300 rounded-full"
-            style={{ width: `${((currentIndex + (isFinished ? 1 : 0)) / QUIZ_QUESTIONS.length) * 100}%` }}
+            style={{ width: `${((currentIndex + (isFinished ? 1 : 0)) / questions.length) * 100}%` }}
           />
         </div>
       </div>
@@ -176,15 +183,15 @@ export const GamifiedQuiz: React.FC<Props> = ({
                 ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                 : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
             }`}>
-              {passed ? '¡INDUCCIÓN SUPERADA CON ÉXITO!' : 'POR DEBAJO DEL UMBRAL DEL 80%'}
+              {passed ? getTranslation(language, 'passedBanner') : getTranslation(language, 'failedBanner')}
             </span>
             <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
-              Obtuviste {scorePercent}% ({score} de {QUIZ_QUESTIONS.length} correctas)
+              {getTranslation(language, 'youObtained')} {scorePercent}% ({score} {getTranslation(language, 'of')} {questions.length} {getTranslation(language, 'correctHits')})
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-300">
               {passed
-                ? 'Felicitaciones aprendiz, has acreditado el conocimiento pleno de los deberes, derechos y garantías del Acuerdo 0009 de 2024. Tu certificado ha sido generado.'
-                : 'El reglamento exige un 80% para la certificación de inducción institucional. Repasa los módulos o vuelve a intentarlo.'}
+                ? getTranslation(language, 'passedMsg')
+                : getTranslation(language, 'failedMsg')}
             </p>
           </div>
 
@@ -192,19 +199,19 @@ export const GamifiedQuiz: React.FC<Props> = ({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
             <button
               onClick={handleRestart}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm rounded-xl transition-colors border border-slate-200 dark:border-slate-700"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm rounded-xl transition-colors border border-slate-200 dark:border-slate-700 cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
-              Reintentar Desafío
+              {getTranslation(language, 'retryQuiz')}
             </button>
 
             {passed && (
               <button
                 onClick={onGoToCertificate}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#39A900] hover:bg-[#2e8800] text-white font-extrabold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#39A900] hover:bg-[#2e8800] text-white font-extrabold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
               >
                 <GraduationCap className="w-5 h-5" />
-                <span>Ver y Descargar Certificado</span>
+                <span>{getTranslation(language, 'viewDownloadCert')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -214,10 +221,10 @@ export const GamifiedQuiz: React.FC<Props> = ({
           <div className="text-left pt-6 border-t border-slate-200 dark:border-slate-800 max-w-2xl mx-auto space-y-3">
             <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              Revisión Pedagógica de Respuestas
+              {getTranslation(language, 'pedagogicalReview')}
             </h4>
             {userAnswers.map((ua, i) => {
-              const q = QUIZ_QUESTIONS[ua.questionIndex];
+              const q = questions[ua.questionIndex] || questions[0];
               return (
                 <div
                   key={i}
@@ -236,7 +243,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
                     <span>{q.question}</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-300 pl-6 leading-relaxed">
-                    <span className="font-bold text-slate-700 dark:text-slate-200">Norma: </span> {q.articleCitation}. {q.explanation}
+                    <span className="font-bold text-slate-700 dark:text-slate-200">{getTranslation(language, 'ruleQuote')}: </span> {q.articleCitation}. {q.explanation}
                   </p>
                 </div>
               );
@@ -249,10 +256,10 @@ export const GamifiedQuiz: React.FC<Props> = ({
           <div className="bg-slate-50 dark:bg-slate-800/60 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 bg-[#00324D] dark:bg-emerald-700 text-white font-bold rounded-lg">
-                Pregunta {currentIndex + 1} de {QUIZ_QUESTIONS.length}
+                {getTranslation(language, 'questionLabel')} {currentIndex + 1} {getTranslation(language, 'of')} {questions.length}
               </span>
               <span className="font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
-                Categoría: {currentQ.category}
+                {getTranslation(language, 'categoryLabel')}: {currentQ.category}
               </span>
             </div>
             <span className="font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
@@ -316,12 +323,12 @@ export const GamifiedQuiz: React.FC<Props> = ({
                   {selectedOption === currentQ.correctAnswerIndex ? (
                     <>
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      <span>¡Respuesta Correcta!</span>
+                      <span>{getTranslation(language, 'correctAnswer')}</span>
                     </>
                   ) : (
                     <>
                       <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                      <span>Respuesta Incorrecta</span>
+                      <span>{getTranslation(language, 'wrongAnswer')}</span>
                     </>
                   )}
                 </div>
@@ -329,7 +336,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
                   {currentQ.explanation}
                 </p>
                 <div className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 pt-1 border-t border-black/10 dark:border-white/10">
-                  📜 Cita reglamentaria: {currentQ.articleCitation}
+                  📜 {getTranslation(language, 'ruleQuote')}: {currentQ.articleCitation}
                 </div>
               </div>
             )}
@@ -337,7 +344,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
 
           <div className="bg-slate-50 dark:bg-slate-800/60 px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <span className="text-xs text-slate-400 dark:text-slate-400">
-              Selecciona una opción para avanzar
+              {getTranslation(language, 'selectToAdvance')}
             </span>
             <button
               onClick={handleNext}
@@ -348,7 +355,7 @@ export const GamifiedQuiz: React.FC<Props> = ({
                   : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed'
               }`}
             >
-              <span>{currentIndex === QUIZ_QUESTIONS.length - 1 ? 'Finalizar Evaluación' : 'Siguiente Pregunta'}</span>
+              <span>{currentIndex === questions.length - 1 ? getTranslation(language, 'finishQuiz') : getTranslation(language, 'nextQuestion')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

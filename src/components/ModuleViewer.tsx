@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SENA_INFO, RULE_ARTICLES } from '../data/senaData';
+import { SENA_INFO } from '../data/senaData';
+import { Language, getRuleArticles, getTranslation } from '../utils/i18n';
 import { SenaEmblem } from './SenaEmblem';
 import {
   Compass,
@@ -24,6 +25,7 @@ interface Props {
   onOpenExplorer: () => void;
   activeModuleTab?: 'identidad' | 'derechos' | 'deberes' | 'regimen';
   onSelectModuleTab?: (tab: 'identidad' | 'derechos' | 'deberes' | 'regimen') => void;
+  language?: Language;
 }
 
 export const ModuleViewer: React.FC<Props> = ({
@@ -32,7 +34,8 @@ export const ModuleViewer: React.FC<Props> = ({
   onCompleteModule,
   onOpenExplorer,
   activeModuleTab,
-  onSelectModuleTab
+  onSelectModuleTab,
+  language = 'es'
 }) => {
   const [internalTab, setInternalTab] = useState<'identidad' | 'derechos' | 'deberes' | 'regimen'>('identidad');
   const activeTab = activeModuleTab || internalTab;
@@ -48,7 +51,7 @@ export const ModuleViewer: React.FC<Props> = ({
     if (!readTopics[id]) {
       playSound('correct');
       setReadTopics((prev) => ({ ...prev, [id]: true }));
-      onEarnXP(xpPoints, 'Lectura y comprensión normativa');
+      onEarnXP(xpPoints, language === 'en' ? 'Regulatory reading & comprehension' : 'Lectura y comprensión normativa');
     }
   };
 
@@ -56,38 +59,40 @@ export const ModuleViewer: React.FC<Props> = ({
     if (!completedModules.includes(moduleId)) {
       playSound('unlock');
       onCompleteModule(moduleId);
-      onEarnXP(100, `Módulo ${moduleId} completado con éxito`);
+      onEarnXP(100, language === 'en' ? `Module ${moduleId} successfully completed` : `Módulo ${moduleId} completado con éxito`);
     }
   };
+
+  const articles = getRuleArticles(language);
 
   const tabs = [
     {
       id: 'identidad',
-      label: '1. Identidad y FPI',
+      label: getTranslation(language, 'tabIdentidad'),
       icon: Compass,
       moduleId: 'mod-1',
-      desc: 'Misión, valores y etapas de formación'
+      desc: getTranslation(language, 'tabIdentidadDesc')
     },
     {
       id: 'derechos',
-      label: '2. Derechos del Aprendiz',
+      label: getTranslation(language, 'tabDerechos'),
       icon: ShieldCheck,
       moduleId: 'mod-2',
-      desc: 'Garantías, Bienestar y Debido Proceso'
+      desc: getTranslation(language, 'tabDerechosDesc')
     },
     {
       id: 'deberes',
-      label: '3. Deberes y Prohibiciones',
+      label: getTranslation(language, 'tabDeberes'),
       icon: CheckCircle2,
       moduleId: 'mod-3',
-      desc: 'Ética, convivencia y no al plagio'
+      desc: getTranslation(language, 'tabDeberesDesc')
     },
     {
       id: 'regimen',
-      label: '4. Régimen Disciplinario',
+      label: getTranslation(language, 'tabRegimen'),
       icon: Scale,
       moduleId: 'mod-4',
-      desc: 'Medidas formativas vs sanciones'
+      desc: getTranslation(language, 'tabRegimenDesc')
     }
   ];
 
@@ -100,24 +105,26 @@ export const ModuleViewer: React.FC<Props> = ({
             <div className="flex items-center gap-2 mb-1.5">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center gap-1 border border-emerald-200 dark:border-emerald-800">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                Ruta de Aprendizaje Obligatoria
+                {getTranslation(language, 'mandatoryRoute')}
               </span>
-              <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">Acuerdo 0009 de 2024</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+                {getTranslation(language, 'regulation')}
+              </span>
             </div>
             <h2 className="text-2xl font-black text-[#00324D] dark:text-white tracking-tight">
-              Módulos Formativos de la Inducción SENA
+              {getTranslation(language, 'modulesTitle')}
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mt-1">
-              Explora cada pilar normativo, marca los temas completados para acumular XP y desbloquear el simulador de casos y la evaluación final.
+              {getTranslation(language, 'modulesSubtitle')}
             </p>
           </div>
 
           <button
             onClick={onOpenExplorer}
-            className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors border border-slate-200 dark:border-slate-700 self-start md:self-center"
+            className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors border border-slate-200 dark:border-slate-700 self-start md:self-center cursor-pointer"
           >
             <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            Explorador del Reglamento
+            {getTranslation(language, 'ruleExplorerBtn')}
           </button>
         </div>
 
@@ -125,8 +132,8 @@ export const ModuleViewer: React.FC<Props> = ({
         <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between text-xs mb-1.5 font-bold">
             <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <span>Progreso de Módulos (Acuerdo 0009 de 2024):</span>
-              <span className="text-[#39A900] dark:text-emerald-400 font-extrabold">{completedModules.length} de {tabs.length} completados</span>
+              <span>{getTranslation(language, 'moduleProgress')}</span>
+              <span className="text-[#39A900] dark:text-emerald-400 font-extrabold">{completedModules.length} {getTranslation(language, 'of')} {tabs.length} {getTranslation(language, 'completedOf')}</span>
             </span>
             <span className="text-emerald-700 dark:text-emerald-400 font-black">
               {Math.round((completedModules.length / tabs.length) * 100)}%
@@ -342,17 +349,21 @@ export const ModuleViewer: React.FC<Props> = ({
           {/* Module Complete Action */}
           <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-between transition-colors">
             <div>
-              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">¿Terminaste de revisar este módulo?</h5>
-              <p className="text-xs text-emerald-800 dark:text-emerald-300">Márcalo como completado para ganar tus 100 XP y pasar a los Derechos del Aprendiz.</p>
+              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">
+                {language === 'en' ? 'Finished reviewing this module?' : '¿Terminaste de revisar este módulo?'}
+              </h5>
+              <p className="text-xs text-emerald-800 dark:text-emerald-300">
+                {language === 'en' ? 'Mark it as completed to earn your 100 XP and move to Apprentice Rights.' : 'Márcalo como completado para ganar tus 100 XP y pasar a los Derechos del Aprendiz.'}
+              </p>
             </div>
             <button
               onClick={() => {
                 markCurrentTabCompleted('mod-1');
                 setActiveTab('derechos');
               }}
-              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
             >
-              <span>Continuar a Derechos</span>
+              <span>{language === 'en' ? 'Continue to Rights' : 'Continuar a Derechos'}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -377,7 +388,7 @@ export const ModuleViewer: React.FC<Props> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {RULE_ARTICLES.filter((a) => a.category === 'derecho').map((derecho) => {
+            {articles.filter((a) => a.category === 'derecho').map((derecho) => {
               const isRead = !!readTopics[derecho.id];
               return (
                 <div
@@ -424,17 +435,21 @@ export const ModuleViewer: React.FC<Props> = ({
           {/* Module Complete Action */}
           <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-between transition-colors">
             <div>
-              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">Módulo de Derechos Revisado</h5>
-              <p className="text-xs text-emerald-800 dark:text-emerald-300">Conoce ahora tus compromisos éticos y las prohibiciones institucionales.</p>
+              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">
+                {language === 'en' ? 'Rights Module Reviewed' : 'Módulo de Derechos Revisado'}
+              </h5>
+              <p className="text-xs text-emerald-800 dark:text-emerald-300">
+                {language === 'en' ? 'Now explore your ethical commitments and institutional prohibitions.' : 'Conoce ahora tus compromisos éticos y las prohibiciones institucionales.'}
+              </p>
             </div>
             <button
               onClick={() => {
                 markCurrentTabCompleted('mod-2');
                 setActiveTab('deberes');
               }}
-              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
             >
-              <span>Continuar a Deberes</span>
+              <span>{language === 'en' ? 'Continue to Duties' : 'Continuar a Deberes'}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -464,7 +479,7 @@ export const ModuleViewer: React.FC<Props> = ({
                 <h4 className="font-bold text-slate-900 dark:text-white text-base">Deberes Obligatorios del Aprendiz</h4>
               </div>
 
-              {RULE_ARTICLES.filter((a) => a.category === 'deber').map((deber) => {
+              {articles.filter((a) => a.category === 'deber').map((deber) => {
                 const isRead = !!readTopics[deber.id];
                 return (
                   <div
@@ -507,7 +522,7 @@ export const ModuleViewer: React.FC<Props> = ({
                 <h4 className="font-bold text-slate-900 dark:text-white text-base">Prohibiciones Críticas (Tolerancia Cero)</h4>
               </div>
 
-              {RULE_ARTICLES.filter((a) => a.category === 'prohibicion').map((prohibicion) => {
+              {articles.filter((a) => a.category === 'prohibicion').map((prohibicion) => {
                 const isRead = !!readTopics[prohibicion.id];
                 return (
                   <div
@@ -542,17 +557,21 @@ export const ModuleViewer: React.FC<Props> = ({
           {/* Module Complete Action */}
           <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-between transition-colors">
             <div>
-              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">Módulo de Convivencia Revisado</h5>
-              <p className="text-xs text-emerald-800 dark:text-emerald-300">Avanza al régimen sancionatorio y medidas formativas.</p>
+              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">
+                {language === 'en' ? 'Coexistence Module Reviewed' : 'Módulo de Convivencia Revisado'}
+              </h5>
+              <p className="text-xs text-emerald-800 dark:text-emerald-300">
+                {language === 'en' ? 'Advance to the disciplinary regime and formative measures.' : 'Avanza al régimen sancionatorio y medidas formativas.'}
+              </p>
             </div>
             <button
               onClick={() => {
                 markCurrentTabCompleted('mod-3');
                 setActiveTab('regimen');
               }}
-              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
             >
-              <span>Continuar a Régimen Disciplinario</span>
+              <span>{language === 'en' ? 'Continue to Disciplinary Regime' : 'Continuar a Régimen Disciplinario'}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -587,7 +606,7 @@ export const ModuleViewer: React.FC<Props> = ({
                 </div>
               </div>
 
-              {RULE_ARTICLES.filter((a) => a.category === 'medida_formativa').map((m) => (
+              {articles.filter((a) => a.category === 'medida_formativa').map((m) => (
                 <div key={m.id} className="p-3.5 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800/60 text-xs">
                   <div className="flex items-center justify-between font-bold text-emerald-900 dark:text-emerald-200 mb-1">
                     <span>{m.title}</span>
@@ -610,7 +629,7 @@ export const ModuleViewer: React.FC<Props> = ({
                 </div>
               </div>
 
-              {RULE_ARTICLES.filter((a) => a.category === 'sancion').map((s) => (
+              {articles.filter((a) => a.category === 'sancion').map((s) => (
                 <div key={s.id} className="p-3.5 bg-rose-50/50 dark:bg-rose-950/30 rounded-xl border border-rose-200 dark:border-rose-800/60 text-xs">
                   <div className="flex items-center justify-between font-bold text-rose-950 dark:text-rose-200 mb-1">
                     <span>{s.title}</span>
@@ -662,17 +681,21 @@ export const ModuleViewer: React.FC<Props> = ({
           {/* Module Complete Action */}
           <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-between transition-colors">
             <div>
-              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">¡Has completado todos los pilares normativos!</h5>
-              <p className="text-xs text-emerald-800 dark:text-emerald-300">Ahora pon a prueba tu criterio en el Simulador de Casos Prácticos.</p>
+              <h5 className="font-bold text-sm text-emerald-950 dark:text-emerald-200">
+                {language === 'en' ? 'You have completed all regulatory pillars!' : '¡Has completado todos los pilares normativos!'}
+              </h5>
+              <p className="text-xs text-emerald-800 dark:text-emerald-300">
+                {language === 'en' ? 'Now test your judgment in the Case Simulator.' : 'Ahora pon a prueba tu criterio en el Simulador de Casos Prácticos.'}
+              </p>
             </div>
             <button
               onClick={() => {
                 markCurrentTabCompleted('mod-4');
               }}
-              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
             >
               <Check className="w-4 h-4" />
-              <span>Finalizar Módulo 4 (+100 XP)</span>
+              <span>{language === 'en' ? 'Finish Module 4 (+100 XP)' : 'Finalizar Módulo 4 (+100 XP)'}</span>
             </button>
           </div>
         </div>

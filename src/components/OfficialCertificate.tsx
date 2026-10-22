@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LearnerProfile } from '../types';
+import { Language, getTranslation } from '../utils/i18n';
 import { SenaEmblem } from './SenaEmblem';
 import {
   Printer,
@@ -25,6 +26,7 @@ interface Props {
   onGoToQuiz: () => void;
   onOpenDrive?: () => void;
   userRole?: 'instructor' | 'aprendiz';
+  language?: Language;
 }
 
 export const OfficialCertificate: React.FC<Props> = ({
@@ -35,13 +37,14 @@ export const OfficialCertificate: React.FC<Props> = ({
   onEditProfile,
   onGoToQuiz,
   onOpenDrive,
-  userRole = 'instructor'
+  userRole = 'instructor',
+  language = 'es'
 }) => {
   const [copied, setCopied] = useState(false);
 
   // Formatted date
   const today = new Date();
-  const dateFormatted = today.toLocaleDateString('es-CO', {
+  const dateFormatted = today.toLocaleDateString(language === 'en' ? 'en-US' : 'es-CO', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
@@ -70,23 +73,23 @@ export const OfficialCertificate: React.FC<Props> = ({
         </div>
         <div>
           <span className="px-3 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-bold rounded-full border border-amber-200 dark:border-amber-800">
-            Certificado Pendiente de Aprobación
+            {getTranslation(language, 'certPending')}
           </span>
           <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-2 mb-2">
-            Aún no has completado la Evaluación Final
+            {getTranslation(language, 'certPendingTitle')}
           </h3>
           <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto">
-            Para obtener tu Certificado Oficial de Inducción con validez institucional, debes alcanzar al menos un <strong className="text-emerald-700 dark:text-emerald-400">80% de respuestas correctas</strong> en el Desafío del Saber.
+            {getTranslation(language, 'certPendingDesc')}
           </p>
         </div>
 
         <div className="pt-2">
           <button
             onClick={onGoToQuiz}
-            className="px-6 py-3 bg-[#39A900] hover:bg-[#2e8800] text-white font-extrabold text-sm rounded-xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2"
+            className="px-6 py-3 bg-[#39A900] hover:bg-[#2e8800] text-white font-extrabold text-sm rounded-xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Award className="w-4 h-4" />
-            <span>Ir a la Evaluación Final Gamificada</span>
+            <span>{getTranslation(language, 'goToQuizBtn')}</span>
           </button>
         </div>
       </div>
@@ -103,12 +106,12 @@ export const OfficialCertificate: React.FC<Props> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-slate-900 dark:text-white text-sm">Certificado Oficial Acreditado</h3>
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm">{getTranslation(language, 'certAccredited')}</h3>
               <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                Válido para Etapa Lectiva
+                {getTranslation(language, 'validLectiva')}
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Expedido bajo el marco del Acuerdo 0009 de 2024</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{getTranslation(language, 'issuedUnder')}</p>
           </div>
         </div>
 
@@ -118,7 +121,7 @@ export const OfficialCertificate: React.FC<Props> = ({
             className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors border border-slate-200 dark:border-slate-700 cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" />
-            <span>Editar Datos</span>
+            <span>{getTranslation(language, 'editData')}</span>
           </button>
 
           <button
@@ -126,7 +129,7 @@ export const OfficialCertificate: React.FC<Props> = ({
             className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors border border-slate-200 dark:border-slate-700 cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5" />
-            <span>{copied ? '¡Enlace Copiado!' : 'Copiar Validación'}</span>
+            <span>{copied ? getTranslation(language, 'copiedLink') : getTranslation(language, 'copyValidation')}</span>
           </button>
 
           {userRole === 'instructor' && onOpenDrive && (
@@ -138,7 +141,7 @@ export const OfficialCertificate: React.FC<Props> = ({
               className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs rounded-xl transition-colors border border-emerald-300 dark:border-emerald-800 cursor-pointer shadow-xs"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Guardar en Google Drive</span>
+              <span>{getTranslation(language, 'saveDrive')}</span>
             </button>
           )}
 
@@ -147,7 +150,7 @@ export const OfficialCertificate: React.FC<Props> = ({
             className="flex items-center gap-2 px-5 py-2.5 bg-[#00324D] dark:bg-emerald-700 hover:bg-[#002235] dark:hover:bg-emerald-600 text-white font-extrabold text-xs rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
           >
             <Printer className="w-4 h-4" />
-            <span>Imprimir / Descargar PDF</span>
+            <span>{getTranslation(language, 'printPdf')}</span>
           </button>
         </div>
       </div>
@@ -172,29 +175,29 @@ export const OfficialCertificate: React.FC<Props> = ({
           </div>
 
           <p className="text-[11px] font-black tracking-[0.25em] text-[#00324D] uppercase">
-            República de Colombia • Ministerio del Trabajo
+            {getTranslation(language, 'republic')}
           </p>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#00324D] tracking-tight">
-            SERVICIO NACIONAL DE APRENDIZAJE - SENA
+            {getTranslation(language, 'senaOrg')}
           </h1>
           <p className="text-xs font-semibold text-emerald-800 tracking-wider uppercase">
-            Dirección de Formación Profesional Integral • Bienestar al Aprendiz
+            {getTranslation(language, 'directorate')}
           </p>
 
           <div className="w-32 h-1 bg-[#39A900] mx-auto my-3 rounded-full" />
 
           <h2 className="font-cert-title text-xl sm:text-2xl font-bold text-slate-800 uppercase tracking-widest pt-2">
-            Certificado de Aprobación de Inducción
+            {getTranslation(language, 'certApprovalTitle')}
           </h2>
           <p className="text-xs text-slate-500 font-medium italic">
-            Otorgado en mérito al conocimiento integral del Reglamento del Aprendiz (Acuerdo 0009 de 2024)
+            {getTranslation(language, 'certMerit')}
           </p>
         </div>
 
         {/* Certificate Body */}
         <div className="text-center space-y-6 my-6 relative z-10">
           <p className="text-xs sm:text-sm text-slate-600 font-medium tracking-wide">
-            Hace constar que el (la) aprendiz:
+            {getTranslation(language, 'certifiesThat')}
           </p>
 
           <div className="py-2 border-b-2 border-slate-300 max-w-xl mx-auto">
@@ -204,22 +207,22 @@ export const OfficialCertificate: React.FC<Props> = ({
           </div>
 
           <p className="text-xs sm:text-sm text-slate-700 font-medium">
-            Identificado(a) con <span className="font-bold">{profile.documentType} No. {profile.documentNumber}</span>
+            {getTranslation(language, 'identifiedWith')} <span className="font-bold">{profile.documentType} No. {profile.documentNumber}</span>
           </p>
 
           <div className="max-w-2xl mx-auto text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
             <p>
-              Completó satisfactoriamente la jornada y evaluación integral de inducción para el programa:
+              {getTranslation(language, 'completedSat')}
             </p>
             <p className="font-bold text-[#00324D] text-base sm:text-lg">
               {profile.programName}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 text-xs pt-1 text-slate-600">
-              <span><strong>Ficha de Caracterización:</strong> {profile.fichaNumber}</span>
+              <span><strong>{getTranslation(language, 'cohortFicha')}:</strong> {profile.fichaNumber}</span>
               <span>•</span>
-              <span><strong>Modalidad:</strong> {profile.modality}</span>
+              <span><strong>{getTranslation(language, 'modalityLabel')}:</strong> {profile.modality}</span>
               <span>•</span>
-              <span><strong>Centro:</strong> {profile.centerName}</span>
+              <span><strong>{getTranslation(language, 'centerLabel')}:</strong> {profile.centerName}</span>
               <span>•</span>
               <span><strong>{profile.regional}</strong></span>
             </div>
@@ -229,10 +232,10 @@ export const OfficialCertificate: React.FC<Props> = ({
           <div className="flex items-center justify-center gap-4 text-xs font-semibold text-slate-700 pt-1">
             <span className="bg-emerald-50 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              Aprobación con {scorePercent}% de Excelencia
+              {getTranslation(language, 'approvalExcel')} {scorePercent}% {getTranslation(language, 'excelScore')}
             </span>
             <span className="bg-sky-50 text-sky-800 border border-sky-300 px-3 py-1 rounded-full">
-              Puntaje: {totalXP} XP Acumulados
+              {getTranslation(language, 'scoreXp')}: {totalXP} {getTranslation(language, 'accumulatedXp')}
             </span>
           </div>
         </div>
@@ -247,8 +250,8 @@ export const OfficialCertificate: React.FC<Props> = ({
               </span>
             </div>
             <div className="w-44 h-px bg-slate-400 mx-auto" />
-            <p className="text-xs font-bold text-slate-800">Subdirección de Centro</p>
-            <p className="text-[10px] text-slate-500">Centro de Formación SENA</p>
+            <p className="text-xs font-bold text-slate-800">{getTranslation(language, 'subdirectorate')}</p>
+            <p className="text-[10px] text-slate-500">{getTranslation(language, 'trainingCenter')}</p>
           </div>
 
           {/* Official Gold Seal & QR Center */}
@@ -275,7 +278,7 @@ export const OfficialCertificate: React.FC<Props> = ({
               {verificationCode}
             </span>
             <span className="text-[9px] text-emerald-700 font-bold">
-              Verificación Digital Activa
+              {getTranslation(language, 'digitalVerification')}
             </span>
           </div>
 
@@ -287,18 +290,19 @@ export const OfficialCertificate: React.FC<Props> = ({
               </span>
             </div>
             <div className="w-44 h-px bg-slate-400 mx-auto" />
-            <p className="text-xs font-bold text-slate-800">Coordinación Académica</p>
-            <p className="text-[10px] text-slate-500">Bienestar y Formación Profesional</p>
+            <p className="text-xs font-bold text-slate-800">{getTranslation(language, 'academicCoord')}</p>
+            <p className="text-[10px] text-slate-500">{getTranslation(language, 'welfareTraining')}</p>
           </div>
         </div>
 
         {/* Date & Legal reference line */}
         <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-500">
-          <span>Expedido el {dateFormatted} en Colombia</span>
-          <span>Reglamento del Aprendiz SENA • Acuerdo 0009 de 2024</span>
-          <span>SENA: Más Trabajo, Más País</span>
+          <span>{getTranslation(language, 'issuedOn')} {dateFormatted}</span>
+          <span>{getTranslation(language, 'regulation')}</span>
+          <span>{getTranslation(language, 'mottoSena')}</span>
         </div>
       </div>
     </div>
   );
 };
+

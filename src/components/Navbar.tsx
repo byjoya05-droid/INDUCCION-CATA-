@@ -109,7 +109,9 @@ export const Navbar: React.FC<Props> = ({
       id: 'certificado',
       label: getTranslation(language, 'certificate'),
       icon: GraduationCap,
-      badge: isCertificateUnlocked ? '¡Listo!' : 'Bloqueado'
+      badge: isCertificateUnlocked
+        ? (language === 'en' ? 'Ready!' : '¡Listo!')
+        : (language === 'en' ? 'Locked' : 'Bloqueado')
     },
     { id: 'plan', label: getTranslation(language, 'plan'), icon: Calendar }
   ];
@@ -124,7 +126,9 @@ export const Navbar: React.FC<Props> = ({
           <span className="font-bold tracking-wider text-emerald-400">SENA COLOMBIA</span>
           <span className="text-slate-400">|</span>
           <span className="truncate max-w-[180px] sm:max-w-none text-slate-300">
-            Reglamento del Aprendiz • Acuerdo 0009 de 2024
+            {language === 'en'
+              ? 'Apprentice Regulations • Agreement 0009 of 2024'
+              : 'Reglamento del Aprendiz • Acuerdo 0009 de 2024'}
           </span>
           <span className="text-slate-400">|</span>
           <span
@@ -142,7 +146,7 @@ export const Navbar: React.FC<Props> = ({
             ) : (
               <>
                 <GraduationCap className="w-2.5 h-2.5" />
-                <span>Aprendiz</span>
+                <span>{language === 'en' ? 'Apprentice' : 'Aprendiz'}</span>
               </>
             )}
           </span>
@@ -156,11 +160,11 @@ export const Navbar: React.FC<Props> = ({
                 playSound('click');
                 onSwitchRole?.('aprendiz');
               }}
-              title="Cambiar temporalmente a vista de aprendiz"
+              title={language === 'en' ? 'Switch temporarily to apprentice view' : 'Cambiar temporalmente a vista de aprendiz'}
               className="text-amber-300 hover:text-white font-bold transition-colors flex items-center gap-1 cursor-pointer text-[11px]"
             >
               <Eye className="w-3 h-3" />
-              <span className="hidden sm:inline">Ver como Aprendiz</span>
+              <span className="hidden sm:inline">{getTranslation(language, 'viewAsApprentice')}</span>
             </button>
           ) : (
             <button
@@ -168,20 +172,23 @@ export const Navbar: React.FC<Props> = ({
                 playSound('click');
                 onSwitchRole?.('instructor');
               }}
-              title="Acceder con perfil de Instructor"
+              title={language === 'en' ? 'Access with Instructor profile' : 'Acceder con perfil de Instructor'}
               className="text-slate-300 hover:text-emerald-300 transition-colors flex items-center gap-1 cursor-pointer text-[11px] font-semibold"
             >
               <Shield className="w-3 h-3 text-amber-400" />
-              <span>Acceso Instructor</span>
+              <span>{getTranslation(language, 'instructorAccess')}</span>
             </button>
           )}
 
           <span className="hidden sm:inline text-slate-400">|</span>
-          <span className="hidden sm:inline text-slate-300">Ficha: <strong className="text-white">{profile.fichaNumber}</strong></span>
+          <span className="hidden sm:inline text-slate-300">
+            {language === 'en' ? 'Cohort: ' : 'Ficha: '}
+            <strong className="text-white">{profile.fichaNumber}</strong>
+          </span>
           <button
             onClick={onOpenProfile}
             className="hover:text-emerald-300 transition-colors flex items-center gap-1.5 font-semibold"
-            title="Ver / Editar Perfil"
+            title={language === 'en' ? 'View / Edit Profile' : 'Ver / Editar Perfil'}
           >
             <img
               src="/src/assets/images/instructor_apprentice_avatar_1792611661870.jpg"
@@ -257,7 +264,7 @@ export const Navbar: React.FC<Props> = ({
                   <span>{item.label}</span>
                   {item.badge && (
                     <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                      item.badge === '¡Listo!'
+                      item.badge === '¡Listo!' || item.badge === 'Ready!'
                         ? 'bg-[#39A900] text-white'
                         : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
                     }`}>
@@ -277,11 +284,11 @@ export const Navbar: React.FC<Props> = ({
                 playSound('click');
                 onOpenExplorer();
               }}
-              title="Buscar en el Reglamento"
+              title={language === 'en' ? 'Search Regulations' : 'Buscar en el Reglamento'}
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700"
             >
               <Search className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-              <span>Reglamento</span>
+              <span>{getTranslation(language, 'searchRegulation')}</span>
             </button>
 
             {/* Google Drive & Sheets Dynamic Auto-Sync Button (Solo accesible para el Instructor) */}
@@ -292,11 +299,11 @@ export const Navbar: React.FC<Props> = ({
                     playSound('click');
                     onOpenDrive?.();
                   }}
-                  title="Sincronizando automáticamente con Google Drive..."
+                  title={language === 'en' ? 'Automatically syncing with Google Drive...' : 'Sincronizando automáticamente con Google Drive...'}
                   className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-2xs transition-all cursor-pointer animate-pulse"
                 >
                   <RefreshCw className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 animate-spin" />
-                  <span className="hidden sm:inline">Guardando en Drive...</span>
+                  <span className="hidden sm:inline">{language === 'en' ? 'Saving to Drive...' : 'Guardando en Drive...'}</span>
                 </button>
               ) : syncState === 'synced' ? (
                 <button
@@ -304,11 +311,11 @@ export const Navbar: React.FC<Props> = ({
                     playSound('click');
                     onOpenDrive?.();
                   }}
-                  title={`Sincronizado automáticamente en Google Drive${lastSyncTime ? ` a las ${lastSyncTime}` : ''}. Clic para ver enlace de la hoja.`}
+                  title={language === 'en' ? `Automatically synced to Google Drive${lastSyncTime ? ` at ${lastSyncTime}` : ''}. Click to view sheet link.` : `Sincronizado automáticamente en Google Drive${lastSyncTime ? ` a las ${lastSyncTime}` : ''}. Clic para ver enlace de la hoja.`}
                   className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shadow-2xs transition-all cursor-pointer"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#39A900] dark:text-emerald-400" />
-                  <span className="hidden sm:inline">Drive Sincronizado ✓</span>
+                  <span className="hidden sm:inline">{getTranslation(language, 'connectedDrive')}</span>
                 </button>
               ) : syncState === 'error' ? (
                 <button
@@ -316,11 +323,11 @@ export const Navbar: React.FC<Props> = ({
                     playSound('click');
                     onOpenDrive?.();
                   }}
-                  title="Error al sincronizar con Google Drive. Clic para revisar y reintentar."
+                  title={language === 'en' ? 'Error syncing with Google Drive. Click to review and retry.' : 'Error al sincronizar con Google Drive. Clic para revisar y reintentar.'}
                   className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 shadow-2xs transition-all cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                  <span className="hidden sm:inline">Reintentar Drive</span>
+                  <span className="hidden sm:inline">{language === 'en' ? 'Retry Drive' : 'Reintentar Drive'}</span>
                 </button>
               ) : syncState === 'unauthenticated' ? (
                 <button
@@ -332,11 +339,11 @@ export const Navbar: React.FC<Props> = ({
                       onOpenDrive?.();
                     }
                   }}
-                  title="Conectar Google Drive para sincronización automática en vivo de los aprendices"
+                  title={language === 'en' ? 'Connect Google Drive for live automated learner sync' : 'Conectar Google Drive para sincronización automática en vivo de los aprendices'}
                   className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 shadow-2xs transition-all cursor-pointer"
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span className="hidden sm:inline">Conectar Drive</span>
+                  <span className="hidden sm:inline">{getTranslation(language, 'connectDrive')}</span>
                 </button>
               ) : (
                 <button
@@ -344,7 +351,7 @@ export const Navbar: React.FC<Props> = ({
                     playSound('click');
                     onOpenDrive?.();
                   }}
-                  title="Google Drive vinculado. Sincronización automática activa."
+                  title={language === 'en' ? 'Google Drive linked. Automatic sync active.' : 'Google Drive vinculado. Sincronización automática activa.'}
                   className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shadow-2xs transition-all cursor-pointer"
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -359,10 +366,10 @@ export const Navbar: React.FC<Props> = ({
                 playSound('click');
                 onSelectTab('modulos');
               }}
-              title={`Progreso en Módulos del Acuerdo 0009 de 2024: ${completedModulesCount} de ${totalModulesCount} (${Math.round((completedModulesCount / (totalModulesCount || 4)) * 100)}%)`}
+              title={language === 'en' ? `Agreement 0009 of 2024 Modules Progress: ${completedModulesCount} of ${totalModulesCount} (${Math.round((completedModulesCount / (totalModulesCount || 4)) * 100)}%)` : `Progreso en Módulos del Acuerdo 0009 de 2024: ${completedModulesCount} de ${totalModulesCount} (${Math.round((completedModulesCount / (totalModulesCount || 4)) * 100)}%)`}
               className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700"
             >
-              <span className="text-[10px] text-slate-400 font-normal">Módulos:</span>
+              <span className="text-[10px] text-slate-400 font-normal">{language === 'en' ? 'Modules:' : 'Módulos:'}</span>
               <div className="w-10 bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-[#39A900] h-full rounded-full transition-all duration-300"
@@ -380,7 +387,7 @@ export const Navbar: React.FC<Props> = ({
                 playSound('click');
                 onOpenBadges();
               }}
-              title="Insignias Desbloqueadas"
+              title={language === 'en' ? 'Unlocked Badges' : 'Insignias Desbloqueadas'}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950/60 text-amber-800 dark:text-amber-300 transition-colors border border-amber-200 dark:border-amber-800"
             >
               <Award className="w-4 h-4 text-amber-600 dark:text-amber-400" />
@@ -396,7 +403,7 @@ export const Navbar: React.FC<Props> = ({
             {/* Audio Toggle */}
             <button
               onClick={handleSoundToggle}
-              title={soundOn ? 'Silenciar Efectos de Sonido' : 'Activar Sonidos'}
+              title={language === 'en' ? (soundOn ? 'Mute Sound Effects' : 'Enable Sound Effects') : (soundOn ? 'Silenciar Efectos de Sonido' : 'Activar Sonidos')}
               className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               {soundOn ? <Volume2 className="w-4 h-4 text-[#39A900] dark:text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
@@ -408,8 +415,8 @@ export const Navbar: React.FC<Props> = ({
                 playSound('click');
                 onToggleDarkMode();
               }}
-              title={isDarkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
-              aria-label={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
+              title={language === 'en' ? (isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode') : (isDarkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro')}
+              aria-label={language === 'en' ? (isDarkMode ? 'Enable light mode' : 'Enable dark mode') : (isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro')}
               className={`p-2 rounded-xl transition-all flex items-center justify-center border shadow-xs cursor-pointer ${
                 isDarkMode
                   ? 'bg-slate-800 border-amber-500/40 text-amber-300 hover:bg-slate-700 hover:border-amber-400 ring-2 ring-amber-400/20'
@@ -460,7 +467,7 @@ export const Navbar: React.FC<Props> = ({
                 </div>
                 {item.badge && (
                   <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                    item.badge === '¡Listo!'
+                    item.badge === '¡Listo!' || item.badge === 'Ready!'
                       ? 'bg-[#39A900] text-white'
                       : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                   }`}>
@@ -480,7 +487,7 @@ export const Navbar: React.FC<Props> = ({
               className="flex-1 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center gap-1.5"
             >
               {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5" />}
-              <span>{isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
+              <span>{isDarkMode ? (language === 'en' ? 'Light Mode' : 'Modo Claro') : (language === 'en' ? 'Dark Mode' : 'Modo Oscuro')}</span>
             </button>
             <button
               onClick={() => {
@@ -490,7 +497,7 @@ export const Navbar: React.FC<Props> = ({
               className="flex-1 py-2 text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center justify-center gap-1.5"
             >
               <User className="w-3.5 h-3.5" />
-              <span>Mi Perfil</span>
+              <span>{language === 'en' ? 'My Profile' : 'Mi Perfil'}</span>
             </button>
           </div>
         </div>

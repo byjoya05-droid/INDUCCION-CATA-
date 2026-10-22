@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LearnerProfile, Badge, UserRole } from './types';
-import { Language } from './utils/i18n';
+import { Language, getTranslation } from './utils/i18n';
 import { DEFAULT_PROFILE, INITIAL_BADGES } from './data/senaData';
 import { RoleLandingPage } from './components/RoleLandingPage';
 import { InstructorDashboard } from './components/InstructorDashboard';
@@ -437,6 +437,7 @@ export default function App() {
               setProfile((prev) => ({ ...prev, programName: p }));
             }}
             onTriggerSync={triggerManualSync}
+            language={language}
           />
         ) : (
           <>
@@ -456,6 +457,7 @@ export default function App() {
               }}
               currentTab={currentTab as any}
               activeModuleTab={activeModuleTab}
+              language={language}
             />
 
             {/* Onboarding Hero Banner (Only shown on 'modulos' tab) */}
@@ -464,26 +466,28 @@ export default function App() {
                 <div className="max-w-2xl relative z-10 space-y-3">
                   <span className="px-3 py-1 bg-white/20 text-white font-bold text-xs rounded-full inline-flex items-center gap-1.5 backdrop-blur-xs">
                     <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                    Bienvenido(a) a la Inducción Institucional SENA 2024
+                    {language === 'en' ? 'Welcome to SENA Institutional Induction 2026' : 'Bienvenido(a) a la Inducción Institucional SENA 2024'}
                   </span>
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight">
-                    ¡Hola, {profile.fullName.split(' ')[0]}! Prepárate para ser un Aprendiz Integral.
+                    {language === 'en'
+                      ? `Hello, ${profile.fullName.split(' ')[0]}! Prepare to be an Integral Apprentice.`
+                      : `¡Hola, ${profile.fullName.split(' ')[0]}! Prepárate para ser un Aprendiz Integral.`}
                   </h1>
                   <p className="text-sm text-slate-100 leading-relaxed">
-                    Este prototipo interactivo te guiará paso a paso por el nuevo <strong>Acuerdo 0009 de 2024</strong> (Reglamento del Aprendiz). Descubre tus derechos y deberes, toma decisiones en casos reales, supera la evaluación y obtén tu <strong>Certificado Oficial de Inducción</strong> con validez institucional.
+                    {getTranslation(language, 'welcomeBannerDesc')}
                   </p>
                   <div className="pt-2 flex flex-wrap items-center gap-3">
                     <button
                       onClick={() => setIsProfileModalOpen(true)}
-                      className="px-4 py-2 bg-white text-[#00324D] font-bold text-xs rounded-xl hover:bg-slate-100 transition-colors shadow-sm"
+                      className="px-4 py-2 bg-white text-[#00324D] font-bold text-xs rounded-xl hover:bg-slate-100 transition-colors shadow-sm cursor-pointer"
                     >
-                      Actualizar mis Datos (Ficha {profile.fichaNumber})
+                      {getTranslation(language, 'updateData')} ({profile.fichaNumber})
                     </button>
                     <button
                       onClick={() => setIsExplorerModalOpen(true)}
-                      className="px-4 py-2 bg-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/30 transition-colors border border-white/20"
+                      className="px-4 py-2 bg-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/30 transition-colors border border-white/20 cursor-pointer"
                     >
-                      Consultar Artículos Clave
+                      {getTranslation(language, 'checkKeyArticles')}
                     </button>
                   </div>
                 </div>
@@ -499,6 +503,7 @@ export default function App() {
                 onOpenExplorer={() => setIsExplorerModalOpen(true)}
                 activeModuleTab={activeModuleTab}
                 onSelectModuleTab={setActiveModuleTab}
+                language={language}
               />
             )}
 
@@ -507,6 +512,7 @@ export default function App() {
                 onEarnXP={handleEarnXP}
                 onCasesCompleted={handleCasesCompleted}
                 casesFinished={casesFinished}
+                language={language}
               />
             )}
 
@@ -516,6 +522,7 @@ export default function App() {
                 onQuizCompleted={handleQuizCompleted}
                 isCertificateUnlocked={isCertificateUnlocked}
                 onGoToCertificate={() => setCurrentTab('certificado')}
+                language={language}
               />
             )}
 
@@ -528,6 +535,8 @@ export default function App() {
                 onEditProfile={() => setIsProfileModalOpen(true)}
                 onGoToQuiz={() => setCurrentTab('quiz')}
                 onOpenDrive={() => setIsDriveModalOpen(true)}
+                userRole={userRole === 'instructor' ? 'instructor' : 'aprendiz'}
+                language={language}
               />
             )}
 
@@ -541,26 +550,26 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center md:text-left">
             <p className="font-bold text-slate-200">
-              Servicio Nacional de Aprendizaje - SENA • Dirección de Formación Profesional
+              {getTranslation(language, 'footerRights')}
             </p>
             <p className="text-slate-500 text-[11px]">
-              Prototipo de Inducción Gamificada reglamentado bajo el <strong>Acuerdo 0009 de 2024</strong> (deroga Acuerdos 07/2012, 02/2014, 06/2023 y 02/2024).
+              {getTranslation(language, 'footerSub')}
             </p>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-medium">
             <button
               onClick={() => setIsExplorerModalOpen(true)}
-              className="hover:text-emerald-400 transition-colors"
+              className="hover:text-emerald-400 transition-colors cursor-pointer"
             >
-              Reglamento Completo
+              {getTranslation(language, 'fullRegulation')}
             </button>
             <span>•</span>
             <button
               onClick={() => setCurrentTab('plan')}
-              className="hover:text-emerald-400 transition-colors"
+              className="hover:text-emerald-400 transition-colors cursor-pointer"
             >
-              Plan Pedagógico
+              {getTranslation(language, 'pedagogicalPlan')}
             </button>
             <span>•</span>
             <button
@@ -568,9 +577,9 @@ export default function App() {
                 setUserRole('none');
                 localStorage.removeItem('sena_user_role');
               }}
-              className="hover:text-amber-400 transition-colors font-bold text-amber-300"
+              className="hover:text-amber-400 transition-colors font-bold text-amber-300 cursor-pointer"
             >
-              Cambiar de Rol / Salir
+              {getTranslation(language, 'switchRoleExit')}
             </button>
           </div>
         </div>
@@ -583,8 +592,9 @@ export default function App() {
         onClose={() => setIsProfileModalOpen(false)}
         onSave={(newProfile) => {
           setProfile(newProfile);
-          showToast('Perfil de Aprendiz Actualizado', `Ficha: ${newProfile.fichaNumber}`);
+          showToast(language === 'en' ? 'Apprentice Profile Updated' : 'Perfil de Aprendiz Actualizado', `Ficha: ${newProfile.fichaNumber}`);
         }}
+        language={language}
       />
 
       <RuleExplorerModal
@@ -598,6 +608,7 @@ export default function App() {
         isOpen={isBadgeDrawerOpen}
         onClose={() => setIsBadgeDrawerOpen(false)}
         totalXP={totalXP}
+        language={language}
       />
 
       <GoogleDriveSyncModal
@@ -605,8 +616,12 @@ export default function App() {
         onClose={() => setIsDriveModalOpen(false)}
         syncData={syncData}
         onSyncSuccess={(url) => {
-          showToast('¡Registro Guardado en Google Drive!', 'Hoja de cálculo actualizada con éxito');
+          showToast(
+            language === 'en' ? 'Record Saved to Google Drive!' : '¡Registro Guardado en Google Drive!',
+            language === 'en' ? 'Spreadsheet successfully updated' : 'Hoja de cálculo actualizada con éxito'
+          );
         }}
+        language={language}
       />
     </div>
   );

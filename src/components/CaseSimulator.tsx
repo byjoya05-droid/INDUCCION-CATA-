@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CASE_SCENARIOS } from '../data/senaData';
 import { CaseScenario, CaseChoice } from '../types';
+import { Language, getCaseScenarios, getTranslation } from '../utils/i18n';
 import {
   Scale,
   CheckCircle2,
@@ -18,18 +18,21 @@ interface Props {
   onEarnXP: (amount: number, reason: string) => void;
   onCasesCompleted: () => void;
   casesFinished: boolean;
+  language?: Language;
 }
 
 export const CaseSimulator: React.FC<Props> = ({
   onEarnXP,
   onCasesCompleted,
-  casesFinished
+  casesFinished,
+  language = 'es'
 }) => {
   const [currentCaseIndex, setCurrentCaseIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<CaseChoice | null>(null);
   const [completedCases, setCompletedCases] = useState<Record<string, { choiceId: string; points: number }>>({});
 
-  const currentCase: CaseScenario = CASE_SCENARIOS[currentCaseIndex];
+  const scenarios = getCaseScenarios(language);
+  const currentCase: CaseScenario = scenarios[currentCaseIndex] || scenarios[0];
   const isAnswered = !!selectedChoice;
 
   const handleSelectChoice = (choice: CaseChoice) => {
@@ -49,20 +52,20 @@ export const CaseSimulator: React.FC<Props> = ({
     setCompletedCases(newCompleted);
 
     if (choice.points > 0) {
-      onEarnXP(choice.points, `Caso resuelto: ${currentCase.title}`);
+      onEarnXP(choice.points, `${getTranslation(language, 'caseLabel')}: ${currentCase.title}`);
     }
 
     // Check if all cases answered
-    if (Object.keys(newCompleted).length === CASE_SCENARIOS.length) {
+    if (Object.keys(newCompleted).length === scenarios.length) {
       onCasesCompleted();
     }
   };
 
   const handleNextCase = () => {
     playSound('click');
-    if (currentCaseIndex < CASE_SCENARIOS.length - 1) {
+    if (currentCaseIndex < scenarios.length - 1) {
       setCurrentCaseIndex((prev) => prev + 1);
-      const nextCase = CASE_SCENARIOS[currentCaseIndex + 1];
+      const nextCase = scenarios[currentCaseIndex + 1];
       const prevAnswer = completedCases[nextCase.id];
       if (prevAnswer) {
         const found = nextCase.choices.find((c) => c.id === prevAnswer.choiceId);
@@ -76,7 +79,7 @@ export const CaseSimulator: React.FC<Props> = ({
   const handleSelectCaseByIndex = (index: number) => {
     playSound('click');
     setCurrentCaseIndex(index);
-    const targetCase = CASE_SCENARIOS[index];
+    const targetCase = scenarios[index];
     const prevAnswer = completedCases[targetCase.id];
     if (prevAnswer) {
       const found = targetCase.choices.find((c) => c.id === prevAnswer.choiceId);
@@ -104,23 +107,27 @@ export const CaseSimulator: React.FC<Props> = ({
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 flex items-center gap-1 border border-purple-200 dark:border-purple-800">
                 <Scale className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                Simulador del Comité de Convivencia y Ética
+                {getTranslation(language, 'caseSimTitle')}
               </span>
-              <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">Dilemas Reales SENA</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+                {getTranslation(language, 'caseSimTag')}
+              </span>
             </div>
             <h2 className="text-2xl font-black text-[#00324D] dark:text-white tracking-tight">
-              Aprende Tomando Decisiones con el Reglamento
+              {getTranslation(language, 'caseSimHeading')}
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mt-1">
-              Analiza situaciones cotidianas vividas por aprendices en centros de formación y determina la aplicación del debido proceso y las medidas formativas.
+              {getTranslation(language, 'caseSimDesc')}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="text-xs text-slate-400 dark:text-slate-400 block font-medium">Puntos de Simulación</span>
+              <span className="text-xs text-slate-400 dark:text-slate-400 block font-medium">
+                {getTranslation(language, 'simPoints')}
+              </span>
               <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                {totalPoints} / {CASE_SCENARIOS.length * 100} XP
+                {totalPoints} / {scenarios.length * 100} XP
               </span>
             </div>
           </div>
@@ -128,7 +135,7 @@ export const CaseSimulator: React.FC<Props> = ({
 
         {/* Case Stepper */}
         <div className="grid grid-cols-5 gap-2 mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
-          {CASE_SCENARIOS.map((sc, i) => {
+          {scenarios.map((sc, i) => {
             const isCurrent = currentCaseIndex === i;
             const res = completedCases[sc.id];
             const isDone = !!res;
@@ -154,7 +161,7 @@ export const CaseSimulator: React.FC<Props> = ({
                   ) : (
                     <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
                   )}
-                  <span>Caso {i + 1}</span>
+                  <span>{getTranslation(language, 'caseLabel')} {i + 1}</span>
                 </div>
                 <span className="text-[10px] opacity-80 truncate max-w-full">
                   {sc.category}
@@ -171,18 +178,18 @@ export const CaseSimulator: React.FC<Props> = ({
         <div className="bg-slate-50 dark:bg-slate-800/60 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 bg-[#00324D] dark:bg-emerald-700 text-white text-xs font-bold rounded-lg">
-              Caso {currentCaseIndex + 1} de {CASE_SCENARIOS.length}
+              {getTranslation(language, 'caseLabel')} {currentCaseIndex + 1} {getTranslation(language, 'of')} {scenarios.length}
             </span>
             <span className="text-xs font-bold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
-              Área: {currentCase.category}
+              {getTranslation(language, 'area')}: {currentCase.category}
             </span>
             <span className="text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-200 dark:border-purple-800/60">
-              Dificultad: {currentCase.difficulty}
+              {getTranslation(language, 'difficulty')}: {currentCase.difficulty}
             </span>
           </div>
 
           <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-            <span>Personaje:</span>
+            <span>{getTranslation(language, 'character')}:</span>
             <span className="font-bold text-slate-800 dark:text-slate-200">{currentCase.character}</span>
             <span className="text-slate-400 dark:text-slate-500">({currentCase.characterRole})</span>
           </div>
@@ -200,7 +207,7 @@ export const CaseSimulator: React.FC<Props> = ({
 
           <div className="bg-purple-50/70 dark:bg-purple-950/30 p-4 rounded-xl border border-purple-200 dark:border-purple-800/60">
             <span className="text-xs font-bold text-purple-900 dark:text-purple-300 uppercase tracking-wider block mb-1">
-              Dilema a Resolver:
+              {getTranslation(language, 'dilemmaToSolve')}
             </span>
             <p className="text-sm font-semibold text-purple-950 dark:text-purple-100">
               {currentCase.dilemma}
@@ -210,7 +217,7 @@ export const CaseSimulator: React.FC<Props> = ({
           {/* Choices */}
           <div className="space-y-3 pt-2">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-              Selecciona la decisión conforme al Acuerdo 0009 de 2024:
+              {getTranslation(language, 'selectDecision')}
             </span>
 
             {currentCase.choices.map((choice, idx) => {
@@ -262,12 +269,12 @@ export const CaseSimulator: React.FC<Props> = ({
                 {selectedChoice.isCorrect ? (
                   <>
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    <span>¡Excelente Criterio Formativo! (+{selectedChoice.points} XP)</span>
+                    <span>{getTranslation(language, 'excellentCriterion')} (+{selectedChoice.points} XP)</span>
                   </>
                 ) : (
                   <>
                     <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                    <span>Decisión Imprecisa o No Ajustada al Reglamento (+{selectedChoice.points} XP)</span>
+                    <span>{getTranslation(language, 'inaccurateDecision')} (+{selectedChoice.points} XP)</span>
                   </>
                 )}
               </div>
@@ -278,7 +285,7 @@ export const CaseSimulator: React.FC<Props> = ({
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-black/10 dark:border-white/10 text-xs">
                 <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  📜 Fundamento Normativo: {selectedChoice.legalBasis}
+                  📜 {getTranslation(language, 'legalBasis')}: {selectedChoice.legalBasis}
                 </span>
                 <span className="italic text-slate-500 dark:text-slate-400">
                   💡 {currentCase.keyTakeaway}
@@ -295,11 +302,11 @@ export const CaseSimulator: React.FC<Props> = ({
             className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Reiniciar Casos
+            {getTranslation(language, 'restartCases')}
           </button>
 
           <div className="flex items-center gap-3">
-            {currentCaseIndex < CASE_SCENARIOS.length - 1 ? (
+            {currentCaseIndex < scenarios.length - 1 ? (
               <button
                 onClick={handleNextCase}
                 disabled={!selectedChoice}
@@ -309,14 +316,14 @@ export const CaseSimulator: React.FC<Props> = ({
                     : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed'
                 }`}
               >
-                <span>Siguiente Caso</span>
+                <span>{getTranslation(language, 'nextCase')}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1.5 rounded-lg flex items-center gap-1 border border-emerald-200 dark:border-emerald-800">
                   <Award className="w-4 h-4" />
-                  ¡Todos los casos completados!
+                  {getTranslation(language, 'allCasesDone')}
                 </span>
               </div>
             )}

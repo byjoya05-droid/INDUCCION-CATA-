@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LearnerProfile } from '../types';
+import { Language, getTranslation } from '../utils/i18n';
 import { User, FileText, Building2, MapPin, CheckCircle2, X } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
@@ -8,6 +9,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSave: (newProfile: LearnerProfile) => void;
+  language?: Language;
 }
 
 const REGIONALS = [
@@ -25,7 +27,13 @@ const REGIONALS = [
   'Regional Bolívar'
 ];
 
-export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose, onSave }) => {
+export const LearnerProfileModal: React.FC<Props> = ({
+  profile,
+  isOpen,
+  onClose,
+  onSave,
+  language = 'es'
+}) => {
   const [formData, setFormData] = useState<LearnerProfile>(profile);
 
   if (!isOpen) return null;
@@ -47,13 +55,13 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
               <User className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h3 className="font-bold text-lg">Perfil del Aprendiz SENA</h3>
-              <p className="text-xs text-slate-300">Estos datos aparecerán en tu Certificado Oficial</p>
+              <h3 className="font-bold text-lg">{getTranslation(language, 'profileTitle')}</h3>
+              <p className="text-xs text-slate-300">{getTranslation(language, 'profileDesc')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -63,7 +71,7 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-              Nombre Completo del Aprendiz
+              {getTranslation(language, 'fullName')}
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -81,7 +89,7 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Tipo Doc.
+                {getTranslation(language, 'docType')}
               </label>
               <select
                 value={formData.documentType}
@@ -98,7 +106,7 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
 
             <div className="col-span-2">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Número de Identificación
+                {getTranslation(language, 'docNumber')}
               </label>
               <div className="relative">
                 <FileText className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -117,7 +125,7 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Programa de Formación
+                {getTranslation(language, 'programName')}
               </label>
               <input
                 type="text"
@@ -131,7 +139,7 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Ficha No.
+                {getTranslation(language, 'fichaNumber')}
               </label>
               <input
                 type="text"
@@ -147,7 +155,7 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Regional SENA
+                {getTranslation(language, 'regionalLabel')}
               </label>
               <div className="relative">
                 <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -165,24 +173,24 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Modalidad
+                {getTranslation(language, 'modalityTitle')}
               </label>
               <select
                 value={formData.modality}
                 onChange={(e) => setFormData({ ...formData, modality: e.target.value as any })}
                 className="w-full px-3 py-2 text-xs border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#39A900] outline-none font-medium bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               >
-                <option value="Presencial">Presencial</option>
-                <option value="Virtual">Virtual (Zajuna)</option>
-                <option value="Distancia">A Distancia</option>
-                <option value="Mixta">Mixta / Combinada</option>
+                <option value="Presencial">{language === 'en' ? 'Face-to-face' : 'Presencial'}</option>
+                <option value="Virtual">{language === 'en' ? 'Virtual (Zajuna)' : 'Virtual (Zajuna)'}</option>
+                <option value="Distancia">{language === 'en' ? 'Distance' : 'A Distancia'}</option>
+                <option value="Mixta">{language === 'en' ? 'Blended' : 'Mixta / Combinada'}</option>
               </select>
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-              Centro de Formación
+              {getTranslation(language, 'centerNameLabel')}
             </label>
             <div className="relative">
               <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -201,16 +209,16 @@ export const LearnerProfileModal: React.FC<Props> = ({ profile, isOpen, onClose,
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
             >
-              Cancelar
+              {getTranslation(language, 'cancel')}
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#39A900] hover:bg-[#2e8800] text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
             >
               <CheckCircle2 className="w-4 h-4" />
-              Guardar y Actualizar
+              {getTranslation(language, 'saveProfileBtn')}
             </button>
           </div>
         </form>
