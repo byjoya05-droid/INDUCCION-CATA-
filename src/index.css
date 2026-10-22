@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer utilities {
+  .font-cert-title {
+    font-family: 'Cinzel', serif;
+  }
+}
+
+/* Atmospheric blur transition effect when toggling theme */
+.screen-blur-active {
+  animation: screenBlurPulse 650ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes screenBlurPulse {
+  0% {
+    filter: blur(14px) brightness(0.9);
+    transform: scale(0.995);
+  }
+  40% {
+    filter: blur(8px) brightness(1.05);
+    transform: scale(1);
+  }
+  100% {
+    filter: blur(0px) brightness(1);
+    transform: scale(1);
+  }
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .certificate-page {
+    box-shadow: none !important;
+    border-width: 4px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    page-break-inside: avoid !important;
+    page-break-after: always !important;
+  }
+}
